@@ -1,1 +1,5 @@
-//* Job model
+package models
+
+type Job struct{
+	
+}
