@@ -37,7 +37,7 @@ func startApp() error {
 		return fmt.Errorf("parsing auth private key %w", err)
 	}
 
-	publicPEM, err := os.ReadFile("private.pem")
+	publicPEM, err := os.ReadFile("pubkey.pem")
 	if err != nil {
 		return fmt.Errorf("reading auth public key %w", err)
 	}

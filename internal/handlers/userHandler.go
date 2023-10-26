@@ -31,7 +31,7 @@ func (h *handler) Signup(c *gin.Context) {
 	}
 
 	// Define a NewUser variable
-	var nu models.User
+	var nu models.NewUser
 
 	// Attempt to decode JSON from the request body into the NewUser variable
 	err := json.NewDecoder(c.Request.Body).Decode(&nu)
