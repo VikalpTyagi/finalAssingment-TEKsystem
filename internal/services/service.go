@@ -12,6 +12,7 @@ import (
 type Service interface {
 	// CreatInventory(ctx context.Context, ni NewInventory, userId uint) (Inventory, error)
 	// ViewInventory(ctx context.Context, userId string) ([]Inventory, float64, error)
+	CreateCompany(ctx context.Context, newComp models.Company) (models.Company, error) 
 	CreateUser(ctx context.Context, nu models.NewUser) (models.User, error)
 	Authenticate(ctx context.Context, email, password string) (jwt.RegisteredClaims,
 		error)

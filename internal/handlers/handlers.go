@@ -41,6 +41,7 @@ func API(a *auth.Auth, c *services.DbConnStruct) *gin.Engine {
 	ginEngine.GET("/check", mid.Authenticate(check))
 	ginEngine.POST("/signup", h.Signup)
 	ginEngine.POST("/login", h.Login)
+	ginEngine.POST("/RegisterCompany", h.RegisterCompany)
 	// ginEngine.POST("/add", mid.Authenticate(h.AddInventory))
 	// ginEngine.POST("/view", mid.Authenticate(h.ViewInventory))
 
@@ -49,17 +50,11 @@ func API(a *auth.Auth, c *services.DbConnStruct) *gin.Engine {
 }
 
 func check(c *gin.Context) {
-	//handle panic using recovery function when happening in separate goroutine
-	//go func() {
-	//	panic("some kind of panic")
-	//}()
 	select {
 	case <-c.Request.Context().Done():
 		fmt.Println("user not there")
 		return
 	default:
 		c.JSON(http.StatusOK, gin.H{"msg": "statusOk"})
-
 	}
-
 }
