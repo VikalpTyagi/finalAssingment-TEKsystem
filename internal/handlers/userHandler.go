@@ -38,7 +38,7 @@ func (h *handler) Signup(c *gin.Context) {
 	if err != nil {
 		// If there is an error in decoding, log the error and return
 		log.Error().Err(err).Str("Trace Id", traceId)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg in decoder": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
 

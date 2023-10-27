@@ -10,8 +10,7 @@ import (
 //go:generate mockgen -source service.go -destination mockmodels/service_mock.go -package mockmodels
 
 type Service interface {
-	// CreatInventory(ctx context.Context, ni NewInventory, userId uint) (Inventory, error)
-	// ViewInventory(ctx context.Context, userId string) ([]Inventory, float64, error)
+	JobByCompanyId(ctx context.Context,jobs []models.Job,compId string,)([]models.Job,error)
 	FetchCompanyByID(ctx context.Context, companyId string) (models.Company, error) 
 	ViewCompanies(ctx context.Context)([]models.Company,error)
 	CreateCompany(ctx context.Context, newComp models.Company) (models.Company, error) 
