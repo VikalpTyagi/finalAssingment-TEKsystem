@@ -15,14 +15,17 @@ func (s *DbConnStruct) jobByCompanyId(ctx context.Context,jobs []models.Job,comp
 	}
 	for _,j := range jobs{
 
-		jobs := models.Job{
+		job := models.Job{
 			Name: j.Name,
 			Field:j.Field,
 			Experience:j.Experience,
 			CompanyId: companyId,
 
 		}
-		
+		err := s.db.Create(&job).Error
+	if err != nil {
+		return nil, err
 	}
-	
+	}
+	return jobs,nil
 }
