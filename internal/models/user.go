@@ -5,13 +5,13 @@ import "gorm.io/gorm"
 
 type User struct{
 	gorm.Model
-	Name string	`Json:"Name"`
-	Email string	`Json:"Email"`
-	PassHash string	`Json:"-"`
+	Name string	`json:"name"`
+	Email string	`json:"email"`
+	PassHash string	`json:"-"`
 }
 type NewUser struct{
 	gorm.Model
-	Name string `json:"Name" validate:"required"`
-	Email string `json:"Email" validate:"required,email"`
-	Password string `Json:"Password" validate:"required`
+	Name string `json:"name" validate:"required"`
+	Email string `json:"email" validate:"required,email"`
+	Password string `Json:"password" validate:"required`
 }

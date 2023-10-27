@@ -41,9 +41,9 @@ func API(a *auth.Auth, c *services.DbConnStruct) *gin.Engine {
 	ginEngine.GET("/check", mid.Authenticate(check))
 	ginEngine.POST("/signup", h.Signup)
 	ginEngine.POST("/login", h.Login)
-	ginEngine.POST("/RegisterCompany", h.RegisterCompany)
-	// ginEngine.POST("/add", mid.Authenticate(h.AddInventory))
-	// ginEngine.POST("/view", mid.Authenticate(h.ViewInventory))
+	ginEngine.POST("/registerCompany", h.RegisterCompany)
+	ginEngine.GET("/listCompanies", h.fetchListOfCompany)
+	ginEngine.GET("/company/:ID", h.companyById)
 
 	// Return the prepared Gin engine
 	return ginEngine

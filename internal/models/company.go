@@ -4,13 +4,14 @@ import "gorm.io/gorm"
 
 type Company struct {
 	gorm.Model
-	Name string	`Json:"Company Name" validate:"required"`
-	City string	`Json:"City" validate:"required"`
-	Jobs []Job `Json:"Jobs, omitempty" gorm:"foreignKey:ID"`
+	Name string	`json:"companyName" validate:"required"`
+	City string	`json:"city" validate:"required"`
+	Jobs []Job `json:"jobs,omitempty" gorm:"foreignKey:CompanyId"`
 }
 type Job struct {
 	gorm.Model
-	Name  string	`Json:"Job Title"`
-	Field string	`Json:"Field"`
-	Experience uint	`Json:"Experience"`
+	Name  string	`json:"title"`
+	Field string	`json:"field"`
+	Experience uint	`json:"experience"`
+	CompanyId uint `json:"companyId"`
 }
