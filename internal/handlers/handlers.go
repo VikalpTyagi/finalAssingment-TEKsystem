@@ -46,6 +46,11 @@ func API(a *auth.Auth, c *services.DbConnStruct) *gin.Engine {
 	ginEngine.GET("/company/:ID", h.companyById)
 	ginEngine.POST("/addJobs/:ID",h.addJobsById)
 
+
+	ginEngine.GET("/fetchJob/:ID",h.fetchJobById)
+	ginEngine.GET("/jobBycompany/:companyId",h.jobsByCompanyById)
+	ginEngine.GET("/getAllJob",h.GetAllJobs)
+
 	// Return the prepared Gin engine
 	return ginEngine
 }
