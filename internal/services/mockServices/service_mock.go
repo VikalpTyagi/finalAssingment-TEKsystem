@@ -5,6 +5,7 @@
 //
 //	mockgen.exe -source service.go -destination mockServices/service_mock.go -package mockmodels
 //
+
 // Package mockmodels is a generated GoMock package.
 package mockmodels
 
