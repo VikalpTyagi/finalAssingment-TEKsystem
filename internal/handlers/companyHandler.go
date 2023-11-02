@@ -28,7 +28,7 @@ func (h *handler) RegisterCompany(c *gin.Context) {
 	err := json.NewDecoder(c.Request.Body).Decode(&newComp)
 	if err != nil {
 		// If there is an error in decoding, log the error and return
-		log.Error().Err(err).Str("Tracker Id", trackerId)
+		log.Error().Err(err).Str("tracker Id", trackerId)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
