@@ -4,7 +4,6 @@ go 1.21.1
 
 require (
 	github.com/99designs/gqlgen v0.17.40
-	github.com/stretchr/testify v1.8.4
 	go.uber.org/mock v0.3.0
 	gorm.io/driver/postgres v1.5.4
 )
@@ -12,9 +11,7 @@ require (
 require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sosodev/duration v1.1.0 // indirect

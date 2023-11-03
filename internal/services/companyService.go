@@ -5,39 +5,27 @@ import (
 	"finalAssing/internal/models"
 )
 
-func (s *DbConnStruct) CreateCompany(ctx context.Context, newComp models.Company) (models.Company, error) {
-
-	comp := models.Company{
-		Name: newComp.Name,
-		City: newComp.City,
-		Jobs: newComp.Jobs,
-	}
-	err := s.db.Create(&comp).Error
+func (s *Store) CreateCompany(ctx context.Context, newComp models.Company) (models.Company, error) {
+comp,err := s.Repo.SaveCompany(newComp)
 	if err != nil {
 		return models.Company{}, err
 	}
 	return comp, nil
 }
 
-func (s *DbConnStruct) ViewCompanies(ctx context.Context)([]models.Company,error){
-	var listComp []models.Company
-	tx := s.db.WithContext(ctx)
-	err := tx.Find(&listComp).Error
+func (s *Store) ViewCompanies(ctx context.Context)([]models.Company,error){
+	listComp,err := s.Repo.FetchAllCompanies(ctx)
 	if err != nil {
 		return nil, err
 	}
-
 	return listComp, nil
 }
 
-func (s *DbConnStruct) FetchCompanyByID(ctx context.Context, companyId string) (models.Company , error) {
-	var comp models.Company
-	tx := s.db.WithContext(ctx).Where("ID = ?", companyId)
-	err := tx.Find(&comp).Error
+func (s *Store) FetchCompanyByID(ctx context.Context, companyId string) (models.Company , error) {
+	comp,err := s.Repo.GetCompaniesById(ctx,companyId)
 	if err != nil {
 		return models.Company{}, err
 	}
-
 	return comp, nil
 
 }

@@ -6,7 +6,6 @@ import (
 	"gorm.io/gorm"
 )
 
-
 func Open() (*gorm.DB, error) {
 	dsn := "host=localhost user=postgres password=admin dbname=postgres port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -15,5 +14,3 @@ func Open() (*gorm.DB, error) {
 	}
 	return db, nil
 }
-
-

@@ -4,44 +4,27 @@ package services
 import (
 	"context"
 	"finalAssing/internal/models"
-	"strconv"
 )
 
-func (s *DbConnStruct) JobByCompanyId(jobs []models.Job, compId string) ([]models.Job, error) {
-	companyId, err := strconv.ParseUint(compId, 10, 64)
+func (s *Store) JobByCompanyId(jobs []models.Job, compId string) ([]models.Job, error) {
+	listOfjobs, err := s.Repo.SaveJobsByCompanyId(jobs, compId)
 	if err != nil {
 		return nil, err
 	}
-	for _, j := range jobs {
-		job := models.Job{
-			Name:       j.Name,
-			Field:      j.Field,
-			Experience: j.Experience,
-			CompanyId:  companyId,
-		}
-		err := s.db.Create(&job).Error
-		if err != nil {
-			return nil, err
-		}
-	}
-	return jobs, nil
+	return listOfjobs, nil
 }
 
-func (s *DbConnStruct) FetchJobByCompanyId(ctx context.Context, companyId string) ([]models.Job, error) {
-	var listOfJobs []models.Job
-	tx := s.db.WithContext(ctx).Where("company_id = ?", companyId)
-	err := tx.Find(&listOfJobs).Error
+func (s *Store) FetchJobByCompanyId(ctx context.Context, companyId string) ([]models.Job, error) {
+	listOfJob, err := s.Repo.GetJobsByCId(ctx, companyId)
 	if err != nil {
 		return nil, err
 	}
 
-	return listOfJobs, nil
+	return listOfJob, nil
 }
 
-func (s *DbConnStruct) GetJobById(ctx context.Context, jobId string) (models.Job,error){
-	var jobData models.Job
-	tx := s.db.WithContext(ctx).Where("ID = ?", jobId)
-	err := tx.Find(&jobData).Error
+func (s *Store) GetJobById(ctx context.Context, jobId string) (models.Job, error) {
+	jobData, err := s.Repo.FetchByJobId(ctx, jobId)
 	if err != nil {
 		return models.Job{}, err
 	}
@@ -49,13 +32,10 @@ func (s *DbConnStruct) GetJobById(ctx context.Context, jobId string) (models.Job
 	return jobData, nil
 }
 
-func (s *DbConnStruct) GetAllJobs(ctx context.Context) ([]models.Job,error){
-	var listJobs []models.Job
-	tx := s.db.WithContext(ctx)
-	err := tx.Find(&listJobs).Error
+func (s *Store) GetAllJobs(ctx context.Context) ([]models.Job, error) {
+	listJobs, err := s.Repo.FetchAllJobs(ctx)
 	if err != nil {
-		return nil, err
+		return []models.Job{}, err
 	}
-
 	return listJobs, nil
 }
