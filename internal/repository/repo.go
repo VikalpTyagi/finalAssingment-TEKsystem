@@ -8,6 +8,8 @@ import (
 	"gorm.io/gorm"
 )
 
+//go:generate mockgen -source repo.go -destination mockRepo/repository_mock.go -package repository
+
 type RepoInterface interface {
 	SaveUser(userData models.NewUser, hashedPass []byte) (models.User, error)
 	CheckEmail(email, password string) (models.User, error)
