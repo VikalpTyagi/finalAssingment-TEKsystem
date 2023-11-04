@@ -4,31 +4,24 @@ package services
 import (
 	"context"
 	"finalAssing/internal/models"
-	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func (s *Store) CreateUser(ctx context.Context, nu models.NewUser) (models.User, error) {
-	hashedPass, err := bcrypt.GenerateFromPassword([]byte(nu.Password), bcrypt.DefaultCost)
+	userData, err := s.Repo.SaveUser(ctx, nu)
 	if err != nil {
-		log.Err(err).Msg("Error in hasing of Password")
-		return models.User{}, fmt.Errorf("generating password hash: %w", err)
-	}
-	userData,err:= s.Repo.SaveUser(nu,hashedPass)
-	if err!= nil{
-		return models.User{},err
+		return models.User{}, err
 	}
 	return userData, nil
 }
 
 func (s *Store) Authenticate(ctx context.Context, email, password string) (jwt.RegisteredClaims,
 	error) {
-	userData,err := s.Repo.CheckEmail(email,password)
+	userData, err := s.Repo.CheckEmail(email, password)
 	if err != nil {
 		return jwt.RegisteredClaims{}, err
 	}

@@ -8,7 +8,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-//go:generate mockgen -source service.go -destination mockmodels/service_mock.go -package mockmodels
+//go:generate mockgen -source service.go -destination service_mock.go -package services
 
 type Service interface {
 	GetAllJobs(ctx context.Context) ([]models.Job, error)
@@ -23,9 +23,9 @@ type Service interface {
 }
 
 type Store struct {
-	Repo *repository.ReposStruct
+	Repo repository.RepoInterface
 }
 
-func NewStore(repo *repository.ReposStruct) *Store {
+func NewStore(repo repository.RepoInterface) *Store {
 	return &Store{Repo: repo}
 }

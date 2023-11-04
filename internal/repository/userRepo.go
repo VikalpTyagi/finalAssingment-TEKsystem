@@ -1,20 +1,30 @@
 package repository
 
 import (
+	"context"
 	"finalAssing/internal/models"
+	"fmt"
+
+	"github.com/rs/zerolog/log"
+	"golang.org/x/crypto/bcrypt"
 )
 
-func (r *ReposStruct) SaveUser(userData models.NewUser, hashedPass []byte) (models.User, error) {
-	u := models.User{
-		Name:     userData.Name,
-		Email:    userData.Email,
+func (r *ReposStruct) SaveUser(ctx context.Context, nu models.NewUser) (models.User, error) {
+	hashedPass, err := bcrypt.GenerateFromPassword([]byte(nu.Password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Err(err).Msg("Error in hashing of Password")
+		return models.User{}, fmt.Errorf("generating password hash: %w", err)
+	}
+	userData := models.User{
+		Name:     nu.Name,
+		Email:    nu.Email,
 		PassHash: string(hashedPass),
 	}
-	err := r.db.Create(&u).Error
+	err = r.db.Create(&userData).Error
 	if err != nil {
 		return models.User{}, err
 	}
-	return u, nil
+	return userData, nil
 }
 
 func (r *ReposStruct) CheckEmail(email, password string) (models.User, error) {

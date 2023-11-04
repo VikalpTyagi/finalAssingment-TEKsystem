@@ -29,16 +29,16 @@ func API(a *auth.Auth, c *repository.ReposStruct) *gin.Engine {
 	ginEngine.Use(middleware.Logger(), gin.Recovery())
 
 	ginEngine.GET("/check", mid.Authenticate(check))
-	ginEngine.POST("/signup", h.Signup)
-	ginEngine.POST("/login", h.Login)
-	ginEngine.POST("/registerCompany", h.RegisterCompany)
-	ginEngine.GET("/listCompanies", h.fetchListOfCompany)
-	ginEngine.GET("/company/:ID", h.companyById)
-	ginEngine.POST("/addJobs/:ID", h.addJobsById)
+	ginEngine.POST("/api/register", h.Signup)
+	ginEngine.POST("/api/login", h.Login)
+	ginEngine.POST("/api/companies", h.RegisterCompany)
+	ginEngine.GET("/api/companies", h.fetchListOfCompany)
+	ginEngine.GET("/api/companies/:ID", h.companyById)
+	ginEngine.POST("/api/companies/:ID/jobs", h.addJobsById)
 
-	ginEngine.GET("/fetchJob/:ID", h.fetchJobById)
-	ginEngine.GET("/jobBycompany/:companyId", h.jobsByCompanyById)
-	ginEngine.GET("/getAllJob", h.GetAllJobs)
+	ginEngine.GET("/api/jobs/:ID", h.fetchJobById)
+	ginEngine.GET("/api/companies/:companyId/jobs", h.jobsByCompanyById)
+	ginEngine.GET("/api/jobs", h.GetAllJobs)
 
 	return ginEngine
 }
