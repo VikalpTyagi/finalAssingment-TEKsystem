@@ -15,7 +15,7 @@ import (
 )
 
 type handler struct {
-	s *services.Store
+	s services.Service
 	a *auth.Auth
 }
 
