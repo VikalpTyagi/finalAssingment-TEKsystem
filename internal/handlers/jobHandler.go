@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"finalAssing/internal/middleware"
 	"finalAssing/internal/models"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -24,7 +25,8 @@ func (h *handler) addJobsById(c *gin.Context) {
 	err := json.NewDecoder(c.Request.Body).Decode(&jobs)
 	if err != nil {
 		log.Error().Err(err).Str("tracker Id", trackerId)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"Error": http.StatusText(http.StatusInternalServerError)})
+		fmt.Println("============Body oarsing failed",c.Request.Body)
 		return
 	}
 	jobData, err := h.s.JobByCompanyId(jobs, compId)
