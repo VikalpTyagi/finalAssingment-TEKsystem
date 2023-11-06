@@ -92,9 +92,6 @@ func Test_handler_fetchJobById(t *testing.T) {
 }
 
 func Test_handler_addJobsById(t *testing.T) {
-	type args struct {
-		c *gin.Context
-	}
 	tests := []struct {
 		name               string
 		setup              func() (*gin.Context, *httptest.ResponseRecorder, services.Service)
@@ -117,7 +114,7 @@ func Test_handler_addJobsById(t *testing.T) {
 			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
 				rr := httptest.NewRecorder()
 				c, _ := gin.CreateTestContext(rr)
-				c.Request = httptest.NewRequest("GET", "http://test.com", bytes.NewBufferString(" "))
+				c.Request = httptest.NewRequest("POST", "http://test.com", bytes.NewBufferString(" "))
 				return c, rr, nil
 			},
 			expectedStatusCode: 500,
@@ -128,7 +125,7 @@ func Test_handler_addJobsById(t *testing.T) {
 			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
 				rr := httptest.NewRecorder()
 				c, _ := gin.CreateTestContext(rr)
-				httpRequest, _ := http.NewRequest(http.MethodGet, "http://test.com:8080/12", bytes.NewBufferString(`[]`))
+				httpRequest, _ := http.NewRequest(http.MethodPost, "http://test.com:8080/12", bytes.NewBufferString(`[]`))
 				ctx := httpRequest.Context()
 				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "123")
 				httpRequest = httpRequest.WithContext(ctx)
@@ -148,10 +145,7 @@ func Test_handler_addJobsById(t *testing.T) {
 			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
 				rr := httptest.NewRecorder()
 				c, _ := gin.CreateTestContext(rr)
-				httpRequest, _ := http.NewRequest(http.MethodGet, "http://test.com:8080/12", bytes.NewBufferString(`[{
-					"title":  "GO dev",
-					"field": "IT",
-				},]`))
+				httpRequest, _ := http.NewRequest(http.MethodPost, "http://test.com:8080", bytes.NewBufferString(`[]`))
 				ctx := httpRequest.Context()
 				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "123")
 				httpRequest = httpRequest.WithContext(ctx)
@@ -162,7 +156,7 @@ func Test_handler_addJobsById(t *testing.T) {
 				ms.EXPECT().JobByCompanyId(gomock.Any(), gomock.Any()).Return([]models.Job{{
 					Name:  "GO dev",
 					Field: "IT",
-				},}, nil).AnyTimes()
+				}}, nil).AnyTimes()
 				return c, rr, ms
 			},
 			expectedStatusCode: 201,

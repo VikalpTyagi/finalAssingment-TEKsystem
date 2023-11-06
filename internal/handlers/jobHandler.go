@@ -26,13 +26,14 @@ func (h *handler) addJobsById(c *gin.Context) {
 	if err != nil {
 		log.Error().Err(err).Str("tracker Id", trackerId)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"Error": http.StatusText(http.StatusInternalServerError)})
-		fmt.Println("============Body oarsing failed",c.Request.Body)
+		fmt.Println("======Decoder")
 		return
 	}
 	jobData, err := h.s.JobByCompanyId(jobs, compId)
 	if err != nil {
 		log.Error().Err(err).Str("tracker Id", trackerId).Msg("Add Job by companyId problem")
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": "Job creation failed"})
+		fmt.Println("=====CompanyId")
 		return
 	}
 	c.JSON(http.StatusCreated, jobData)
