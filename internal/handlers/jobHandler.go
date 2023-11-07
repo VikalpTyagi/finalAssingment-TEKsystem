@@ -47,7 +47,7 @@ func (h *handler) jobsByCompanyById(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
-	companyId := c.Param("companyId")
+	companyId := c.Param("ID")
 	listOfJobs, err := h.s.FetchJobByCompanyId(ctx, companyId)
 	if err != nil {
 		log.Error().Err(err).Str("tracker Id", trackerId)
@@ -75,7 +75,7 @@ func (h *handler) fetchJobById(c *gin.Context) {
 	c.JSON(http.StatusOK, job)
 }
 
-func (h *handler) GetAllJobs(c *gin.Context) {
+func (h *handler) ViewAllJobs(c *gin.Context) {
 	ctx := c.Request.Context()
 	trackerId, ok := ctx.Value(middleware.TrackerIdKey).(string)
 	if !ok {

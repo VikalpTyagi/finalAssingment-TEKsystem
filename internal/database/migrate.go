@@ -19,7 +19,7 @@ func NewConn(dbInstance *gorm.DB) (*DbConnStruct, error) {
 }
 
 func AutoMigrate(str *DbConnStruct) error {
-	err := str.db.Migrator().AutoMigrate(&models.User{}, &models.Company{}, &models.Job{})
+	err := str.db.Migrator().AutoMigrate(&models.User{}, &models.Company{}, &models.Job{}, &models.Location{},&models.Qualification{},&models.Skill{})
 	if err != nil {
 		return err
 	}

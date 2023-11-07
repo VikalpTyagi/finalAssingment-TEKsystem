@@ -37,8 +37,8 @@ func API(a *auth.Auth, c *repository.ReposStruct) *gin.Engine {
 	ginEngine.POST("/api/companies/:ID/jobs", h.addJobsById)
 
 	ginEngine.GET("/api/jobs/:ID", h.fetchJobById)
-	ginEngine.GET("/api/companies/:companyId/jobs", h.jobsByCompanyById)
-	ginEngine.GET("/api/jobs", h.GetAllJobs)
+	ginEngine.GET("/api/companies/:ID/jobs", h.jobsByCompanyById)
+	ginEngine.GET("/api/jobs", h.ViewAllJobs)
 
 	return ginEngine
 }
