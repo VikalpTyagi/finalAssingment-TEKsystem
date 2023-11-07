@@ -22,6 +22,8 @@ type RepoInterface interface {
 	GetJobsByCId(ctx context.Context, companyId string) ([]models.Job, error)
 	FetchByJobId(ctx context.Context, jobId string) (models.Job, error)
 	FetchAllJobs(ctx context.Context) ([]models.Job,error)
+
+	ApplicantsFilter(ctx context.Context, applicantList []*models.Applicant) ([]*models.ApplicantRespo, error)
 }
 
 type ReposStruct struct {
