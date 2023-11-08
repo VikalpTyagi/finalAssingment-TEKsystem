@@ -6,7 +6,7 @@ import (
 	"finalAssing/internal/models"
 )
 
-func (s *Store) JobByCompanyId(jobs []models.Job, compId string) ([]models.Job, error) {
+func (s *Store) JobByCompanyId(jobs []models.JobReq, compId string) ([]models.JobRespo, error) {
 	listOfjobs, err := s.Repo.SaveJobsByCompanyId(jobs, compId)
 	if err != nil {
 		return nil, err

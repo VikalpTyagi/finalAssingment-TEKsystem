@@ -11,7 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (h *handler) FilterApplicants(c *gin.Context) {
+func (h *handler) AcceptApplicant(c *gin.Context) {
 	ctx := c.Request.Context()
 	trackerId, ok := ctx.Value(middleware.TrackerIdKey).(string)
 	if !ok {
@@ -19,7 +19,7 @@ func (h *handler) FilterApplicants(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
-	var newApplicant []models.Applicant
+	var newApplicant []*models.Applicant
 
 	err := json.NewDecoder(c.Request.Body).Decode(&newApplicant)
 	if err != nil {
@@ -27,12 +27,20 @@ func (h *handler) FilterApplicants(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
-	validate:= validator.New()
-	err=validate.Struct(newApplicant)
-	if err != nil{
-		log.Error().Err(err).Str("tracker Id", trackerId).Send()
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Error":"All fields are mandatory"})
+	validate := validator.New()
+	for _,data := range newApplicant{
+		err = validate.Struct(data)
+	if err != nil {
+		log.Error().Err(err).Str("tracker Id", trackerId).Interface("body", newApplicant).Send()
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Error": "All fields are mandatory"})
 		return
 	}
+	}
 	
+	filteredData, err := h.s.FIlterApplication(ctx, newApplicant)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
+		return
+	}
+	c.JSON(http.StatusOK, filteredData)
 }

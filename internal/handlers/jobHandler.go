@@ -21,7 +21,7 @@ func (h *handler) addJobsById(c *gin.Context) {
 		return
 	}
 	compId := c.Param("ID")
-	var jobs []models.Job
+	var jobs []models.JobReq
 	err := json.NewDecoder(c.Request.Body).Decode(&jobs)
 	if err != nil {
 		log.Error().Err(err).Str("tracker Id", trackerId)

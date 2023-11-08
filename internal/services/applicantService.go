@@ -5,8 +5,8 @@ import (
 	"finalAssing/internal/models"
 )
 
-func (s *Store) FIlterApplication(ctx context.Context,applicantList *models.Applicant) (models.ApplicantRespo,error){
-	selectedApplicants, err := s.ApplicantsFilter(ctx,applicantList)
+func (s *Store) FIlterApplication(ctx context.Context,applicantList []*models.Applicant) ([]*models.ApplicantRespo,error){
+	selectedApplicants, err := s.Repo.ApplicantsFilter(ctx,applicantList)
 	if err !=nil{
 		return nil,err
 	}

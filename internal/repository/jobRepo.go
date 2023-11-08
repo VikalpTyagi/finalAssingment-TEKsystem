@@ -4,21 +4,44 @@ import (
 	"context"
 	"finalAssing/internal/models"
 	"strconv"
+
+	"gorm.io/gorm"
 )
 
-func (r *ReposStruct) SaveJobsByCompanyId(jobs []models.Job, compId string) ([]models.Job, error) {
+func (r *ReposStruct) SaveJobsByCompanyId(jobs []models.JobReq, compId string) ([]models.JobRespo, error) {
 	companyId, err := strconv.ParseUint(compId, 10, 64)
 	if err != nil {
 		return nil, err
 	}
-	var listOfJobs []models.Job
-	for _, j := range jobs {
-		j.CompanyId=companyId
-		listOfJobs = append(listOfJobs, j)
-		err := r.db.Create(&j).Error
+	var listOfJobs []models.JobRespo
+	var gormJobs []models.Job
+	for i := 0; i < len(jobs); i++ {
+		gormData := models.Job{
+			Name:           jobs[i].Name,
+			Field:          jobs[i].Field,
+			Experience:     jobs[i].Experience,
+			Min_NP:         jobs[i].Min_NP,
+			Max_NP:         jobs[i].Max_NP,
+			Budget:         jobs[i].Budget,
+			Locations:      intToLocation(jobs[i].Locations),
+			Stack:          intToSkill(jobs[i].Stack),
+			WorkMode:       jobs[i].WorkMode,
+			Description:    jobs[i].Description,
+			MinExp:         jobs[i].MinExp,
+			Qualifications: intToQuali(jobs[i].Qualifications),
+			Shift:          jobs[i].Shift,
+			CompanyId:      companyId,
+		}
+		
+		err := r.db.Create(&gormData).Error
 		if err != nil {
 			return nil, err
 		}
+		gormJobs = append(gormJobs, gormData)
+		respoData := models.JobRespo{
+			Id: gormJobs[i].ID,
+		}
+		listOfJobs = append(listOfJobs, respoData)
 	}
 	return listOfJobs, nil
 }
@@ -45,7 +68,7 @@ func (r *ReposStruct) FetchByJobId(ctx context.Context, jobId string) (models.Jo
 	return jobData, nil
 }
 
-func (r *ReposStruct) FetchAllJobs(ctx context.Context) ([]models.Job,error){
+func (r *ReposStruct) FetchAllJobs(ctx context.Context) ([]models.Job, error) {
 	var listJobs []models.Job
 	tx := r.db.WithContext(ctx)
 	err := tx.Find(&listJobs).Error
@@ -54,4 +77,36 @@ func (r *ReposStruct) FetchAllJobs(ctx context.Context) ([]models.Job,error){
 	}
 
 	return listJobs, nil
+}
+
+func intToLocation(slice []uint) []models.Location {
+	var locRespo []models.Location
+	for _, s := range slice {
+		loc := models.Location{
+			Model: gorm.Model{ID: s},
+		}
+		locRespo = append(locRespo, loc)
+	}
+	return locRespo
+}
+
+func intToSkill(slice []uint) []models.Skill {
+	var locRespo []models.Skill
+	for _, s := range slice {
+		loc := models.Skill{
+			Model: gorm.Model{ID: s},
+		}
+		locRespo = append(locRespo, loc)
+	}
+	return locRespo
+}
+func intToQuali(slice []uint) []models.Qualification {
+	var skillRespo []models.Qualification
+	for _, s := range slice {
+		skil := models.Qualification{
+			Model: gorm.Model{ID: s},
+		}
+		skillRespo = append(skillRespo, skil)
+	}
+	return skillRespo
 }

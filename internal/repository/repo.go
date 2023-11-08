@@ -18,7 +18,7 @@ type RepoInterface interface {
 	FetchAllCompanies(ctx context.Context) ([]models.Company, error)
 	GetCompaniesById(ctx context.Context, companyId string) (models.Company , error)
 
-	SaveJobsByCompanyId(jobs []models.Job, compId string) ([]models.Job, error)
+	SaveJobsByCompanyId(jobs []models.JobReq, compId string) ([]models.JobRespo, error)
 	GetJobsByCId(ctx context.Context, companyId string) ([]models.Job, error)
 	FetchByJobId(ctx context.Context, jobId string) (models.Job, error)
 	FetchAllJobs(ctx context.Context) ([]models.Job,error)

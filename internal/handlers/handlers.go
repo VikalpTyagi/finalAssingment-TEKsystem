@@ -40,6 +40,8 @@ func API(a *auth.Auth, c *repository.ReposStruct) *gin.Engine {
 	ginEngine.GET("/api/companies/:ID/jobs", h.jobsByCompanyById)
 	ginEngine.GET("/api/jobs", h.ViewAllJobs)
 
+	ginEngine.POST("api/applicant",h.AcceptApplicant)
+
 	return ginEngine
 }
 
