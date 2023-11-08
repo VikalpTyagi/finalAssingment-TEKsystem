@@ -21,7 +21,7 @@ type Service interface {
 	CreateUser(ctx context.Context, nu models.NewUser) (models.User, error)
 	Authenticate(ctx context.Context, email, password string) (jwt.RegisteredClaims,error)
 
-	FIlterApplication(ctx context.Context,applicantList []*models.Applicant) ([]*models.ApplicantRespo,error)
+	FIlterApplication(ctx context.Context,applicantList []*models.ApplicantReq) ([]*models.ApplicantRespo,error)
 }
 
 type Store struct {

@@ -19,20 +19,35 @@ type NewUser struct {
 // * =============================== Applicants struck ==============================================
 type Applicant struct {
 	gorm.Model
-	Name           string 			`json:"name" validate:"required"`
-	JobId            uint			`json:"job" validate:"required"`
-	Experience     uint            `json:"experience" validate:"required"`
-	Min_NP         uint            `json:"min-NP" validate:"required"`
-	Max_NP         uint            `json:"max-NP" validate:"required"`
-	Budget         uint            `json:"salary" validate:"required"`
-	Locations      []uint      `json:"locations" validate:"required" gorm:"many2many:job_location;"`
-	Stack          []uint         `json:"skills" validate:"required" gorm:"many2many:job_skill;"`
-	WorkMode       string          `json:"workMode" validate:"required"`
+	Name           string `json:"name" validate:"required"`
+	JobId          uint   `json:"job" validate:"required"`
+	Experience     uint   `json:"experience" validate:"required"`
+	Min_NP         uint   `json:"min-NP" validate:"required"`
+	Max_NP         uint   `json:"max-NP" validate:"required"`
+	Budget         uint   `json:"salary" validate:"required"`
+	Locations      []uint `json:"locations" validate:"required" gorm:"many2many:job_location;"`
+	Stack          []uint `json:"skills" validate:"required" gorm:"many2many:job_skill;"`
+	WorkMode       string `json:"workMode" validate:"required"`
 	Qualifications []uint `json:"qualification" validate:"required" gorm:"many2many:job_qualifications;"`
-	Shift          string          `json:"shift" validate:"required"`
+	Shift          string `json:"shift" validate:"required"`
+}
+
+type ApplicantReq struct {
+	gorm.Model
+	Name           string 
+	JobId          uint   
+	Experience     uint   
+	Min_NP         uint   
+	Max_NP         uint   
+	Budget         uint   
+	Locations      []uint 
+	Stack          []uint 
+	WorkMode       string 
+	Qualifications []uint 
+	Shift          string 
 }
 
 type ApplicantRespo struct {
-	Name           string
-	JobId			uint
+	Name  string
+	JobId uint
 }

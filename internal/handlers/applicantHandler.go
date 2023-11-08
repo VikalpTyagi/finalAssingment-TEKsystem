@@ -19,7 +19,7 @@ func (h *handler) AcceptApplicant(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
-	var newApplicant []*models.Applicant
+	var newApplicant []*models.ApplicantReq
 
 	err := json.NewDecoder(c.Request.Body).Decode(&newApplicant)
 	if err != nil {

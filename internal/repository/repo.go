@@ -23,7 +23,7 @@ type RepoInterface interface {
 	FetchByJobId(ctx context.Context, jobId string) (models.Job, error)
 	FetchAllJobs(ctx context.Context) ([]models.Job,error)
 
-	ApplicantsFilter(ctx context.Context, applicantList []*models.Applicant) ([]*models.ApplicantRespo, error)
+	ApplicantsFilter(jobId uint) (*models.Job, error)
 }
 
 type ReposStruct struct {
