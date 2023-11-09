@@ -85,6 +85,21 @@ func (mr *MockServiceMockRecorder) CreateUser(ctx, nu any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockService)(nil).CreateUser), ctx, nu)
 }
 
+// FIlterApplication mocks base method.
+func (m *MockService) FIlterApplication(ctx context.Context, applicantList []*models.ApplicantReq) ([]*models.ApplicantRespo, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FIlterApplication", ctx, applicantList)
+	ret0, _ := ret[0].([]*models.ApplicantRespo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FIlterApplication indicates an expected call of FIlterApplication.
+func (mr *MockServiceMockRecorder) FIlterApplication(ctx, applicantList any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FIlterApplication", reflect.TypeOf((*MockService)(nil).FIlterApplication), ctx, applicantList)
+}
+
 // FetchCompanyByID mocks base method.
 func (m *MockService) FetchCompanyByID(ctx context.Context, companyId string) (models.Company, error) {
 	m.ctrl.T.Helper()
@@ -146,10 +161,10 @@ func (mr *MockServiceMockRecorder) GetJobById(ctx, jobId any) *gomock.Call {
 }
 
 // JobByCompanyId mocks base method.
-func (m *MockService) JobByCompanyId(jobs []models.Job, compId string) ([]models.Job, error) {
+func (m *MockService) JobByCompanyId(jobs []models.JobReq, compId string) ([]models.JobRespo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "JobByCompanyId", jobs, compId)
-	ret0, _ := ret[0].([]models.Job)
+	ret0, _ := ret[0].([]models.JobRespo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

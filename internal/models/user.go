@@ -22,7 +22,6 @@ type Applicant struct {
 	Name           string `json:"name" validate:"required"`
 	JobId          uint   `json:"job" validate:"required"`
 	Experience     uint   `json:"experience" validate:"required"`
-	Min_NP         uint   `json:"min-NP" validate:"required"`
 	Max_NP         uint   `json:"max-NP" validate:"required"`
 	Budget         uint   `json:"salary" validate:"required"`
 	Locations      []uint `json:"locations" validate:"required" gorm:"many2many:job_location;"`
@@ -33,18 +32,16 @@ type Applicant struct {
 }
 
 type ApplicantReq struct {
-	gorm.Model
-	Name           string 
-	JobId          uint   
-	Experience     uint   
-	Min_NP         uint   
-	Max_NP         uint   
-	Budget         uint   
-	Locations      []uint 
-	Stack          []uint 
-	WorkMode       string 
-	Qualifications []uint 
-	Shift          string 
+	Name           string `json:"name" validate:"required"`
+	JobId          uint   `json:"job" validate:"required"`
+	Experience     uint   `json:"experience" validate:"required"`
+	Max_NP         uint   `json:"max-NP" validate:"required"`
+	Budget         uint   `json:"salary" validate:"required"`
+	Locations      []uint `json:"locations" validate:"required" `
+	Stack          []uint `json:"skills" validate:"required" `
+	WorkMode       string `json:"workMode" validate:"required"`
+	Qualifications []uint `json:"qualification" validate:"required" `
+	Shift          string `json:"shift" validate:"required"`
 }
 
 type ApplicantRespo struct {

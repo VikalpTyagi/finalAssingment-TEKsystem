@@ -7,7 +7,7 @@ import (
 
 	"gorm.io/gorm"
 )
-
+//@ modified code according new models
 func (r *ReposStruct) SaveJobsByCompanyId(jobs []models.JobReq, compId string) ([]models.JobRespo, error) {
 	companyId, err := strconv.ParseUint(compId, 10, 64)
 	if err != nil {

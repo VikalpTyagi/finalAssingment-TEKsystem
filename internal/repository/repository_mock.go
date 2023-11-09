@@ -39,6 +39,21 @@ func (m *MockRepoInterface) EXPECT() *MockRepoInterfaceMockRecorder {
 	return m.recorder
 }
 
+// ApplicantsFilter mocks base method.
+func (m *MockRepoInterface) ApplicantsFilter(jobId uint) (*models.Job, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ApplicantsFilter", jobId)
+	ret0, _ := ret[0].(*models.Job)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ApplicantsFilter indicates an expected call of ApplicantsFilter.
+func (mr *MockRepoInterfaceMockRecorder) ApplicantsFilter(jobId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplicantsFilter", reflect.TypeOf((*MockRepoInterface)(nil).ApplicantsFilter), jobId)
+}
+
 // CheckEmail mocks base method.
 func (m *MockRepoInterface) CheckEmail(email, password string) (models.User, error) {
 	m.ctrl.T.Helper()
@@ -145,10 +160,10 @@ func (mr *MockRepoInterfaceMockRecorder) SaveCompany(newComp any) *gomock.Call {
 }
 
 // SaveJobsByCompanyId mocks base method.
-func (m *MockRepoInterface) SaveJobsByCompanyId(jobs []models.Job, compId string) ([]models.Job, error) {
+func (m *MockRepoInterface) SaveJobsByCompanyId(jobs []models.JobReq, compId string) ([]models.JobRespo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SaveJobsByCompanyId", jobs, compId)
-	ret0, _ := ret[0].([]models.Job)
+	ret0, _ := ret[0].([]models.JobRespo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -27,8 +27,8 @@ func startApp() error {
 
 	// Initialize authentication support
 	log.Info().Msg("main : Started : Initializing authentication support")
-	// privatePEM, err := os.ReadFile(`C:\Users\ORR Training 17\Documents\final assingment\job portal api\private.pem`)
-	privatePEM, err := os.ReadFile(`F:\go-TEKsystem\finalAssingment-TEKsystem\private.pem`)
+	privatePEM, err := os.ReadFile(`C:\Users\ORR Training 17\Documents\final assingment\job portal api\private.pem`)
+	// privatePEM, err := os.ReadFile(`F:\go-TEKsystem\finalAssingment-TEKsystem\private.pem`)
 	if err != nil {
 		return fmt.Errorf("reading auth private key %w", err)
 	}
@@ -37,8 +37,8 @@ func startApp() error {
 		return fmt.Errorf("parsing auth private key %w", err)
 	}
 
-	// publicPEM, err := os.ReadFile(`C:\Users\ORR Training 17\Documents\final assingment\job portal api\pubkey.pem`)
-	publicPEM, err := os.ReadFile(`F:\go-TEKsystem\finalAssingment-TEKsystem\pubkey.pem`)
+	publicPEM, err := os.ReadFile(`C:\Users\ORR Training 17\Documents\final assingment\job portal api\pubkey.pem`)
+	// publicPEM, err := os.ReadFile(`F:\go-TEKsystem\finalAssingment-TEKsystem\pubkey.pem`)
 	if err != nil {
 		return fmt.Errorf("reading auth public key %w", err)
 	}

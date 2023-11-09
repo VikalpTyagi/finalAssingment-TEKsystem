@@ -15,22 +15,23 @@ import (
 
 func TestStore_JobByCompanyId(t *testing.T) {
 	type args struct {
-		jobs   []models.Job
+		jobs   []models.JobReq
 		compId string
 	}
 	tests := []struct {
 		name string
 		// s       *Store
 		args             args
-		want             []models.Job
+		want             []models.JobRespo
 		wantErr          bool
-		mockRepoResponse func() ([]models.Job, error)
+		mockRepoResponse func() ([]models.JobRespo, error)
 	}{
 		{
 			name: "sucess case",
 			args: args{
-				jobs: []models.Job{
+				jobs: []models.JobReq{
 					{
+	
 						Name:       "Go Dev",
 						Field:      "It",
 						Experience: 2,
@@ -38,22 +39,16 @@ func TestStore_JobByCompanyId(t *testing.T) {
 				},
 				compId: "1",
 			},
-			want: []models.Job{
+			want: []models.JobRespo{
 				{
-					Name:       "Go Dev",
-					Field:      "It",
-					Experience: 2,
-					CompanyId:  1,
+					Id: 1,
 				},
 			},
 			wantErr: false,
-			mockRepoResponse: func() ([]models.Job, error) {
-				return []models.Job{
+			mockRepoResponse: func() ([]models.JobRespo, error) {
+				return []models.JobRespo{
 					{
-						Name:       "Go Dev",
-						Field:      "It",
-						Experience: 2,
-						CompanyId:  1,
+						Id: 1,
 					},
 				}, nil
 			},
@@ -62,7 +57,7 @@ func TestStore_JobByCompanyId(t *testing.T) {
 		{
 			name: "repository error",
 			args: args{
-				jobs: []models.Job{
+				jobs: []models.JobReq{
 					{
 						Name:       "DevOps Engineer",
 						Field:      "IT",
@@ -73,14 +68,14 @@ func TestStore_JobByCompanyId(t *testing.T) {
 			},
 			want:    nil,
 			wantErr: true,
-			mockRepoResponse: func() ([]models.Job, error) {
+			mockRepoResponse: func() ([]models.JobRespo, error) {
 				return nil, errors.New("repository error")
 			},
 		},
 		{
 			name: "error case - empty company ID",
 			args: args{
-				jobs: []models.Job{
+				jobs: []models.JobReq{
 					{
 						Name:       "Sales Manager",
 						Field:      "Marketing",
@@ -91,7 +86,7 @@ func TestStore_JobByCompanyId(t *testing.T) {
 			},
 			want:    nil,
 			wantErr: true,
-			mockRepoResponse: func() ([]models.Job, error) {
+			mockRepoResponse: func() ([]models.JobRespo, error) {
 				return nil, errors.New("test error")
 			},
 		},

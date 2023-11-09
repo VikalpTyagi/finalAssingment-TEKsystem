@@ -14,7 +14,7 @@ func (s *Store) FIlterApplication(ctx context.Context, applicantList []*models.A
 	ch := make(chan *models.ApplicantReq)
 	wg := &sync.WaitGroup{}
 
-	for _, appl := range applicantList {
+	for _, applicant := range applicantList {
 		wg.Add(1)
 		go func(appl *models.ApplicantReq) {
 			defer wg.Done()
@@ -27,11 +27,11 @@ func (s *Store) FIlterApplication(ctx context.Context, applicantList []*models.A
 				log.Error().Err(errors.New("budget requirments not met")).Interface("applicant ID", appl.Name).Send()
 				return
 			}
-			if jobData.Experience <= appl.Experience && appl.Experience > jobData.MinExp {
+			if jobData.Experience < appl.Experience || appl.Experience < jobData.MinExp {
 				log.Error().Err(errors.New("experience requirments not met")).Interface("applicant ID", appl.Name).Send()
 				return
 			}
-			if jobData.Max_NP <= appl.Max_NP && appl.Min_NP <= jobData.Min_NP {
+			if jobData.Max_NP < appl.Max_NP ||  appl.Max_NP < jobData.Min_NP {
 				log.Error().Err(errors.New("notice periode requirments not met")).Interface("applicant ID", appl.Name).Send()
 				return
 			}
@@ -47,13 +47,17 @@ func (s *Store) FIlterApplication(ctx context.Context, applicantList []*models.A
 				log.Error().Err(errors.New("work mode requirments not met")).Interface("applicant ID", appl.Name).Send()
 				return
 			}
+			var passed bool
 			for _, j := range jobData.Qualifications {
 				for _, a := range appl.Qualifications {
-					if j.Model.ID != a {
-						log.Error().Err(errors.New("qualification requirments not met")).Interface("applicant ID", appl.Name).Send()
-						return
+					if j.Model.ID == a {
+						passed = true
 					}
 				}
+			}
+			if !passed {
+				log.Error().Err(errors.New("qualification requirments not met")).Interface("applicant ID", appl.Name).Send()
+				return
 			}
 			var available bool
 			for _, j := range jobData.Locations {
@@ -63,7 +67,7 @@ func (s *Store) FIlterApplication(ctx context.Context, applicantList []*models.A
 					}
 				}
 			}
-			if available == false {
+			if !available {
 				log.Error().Err(errors.New("location requirments not met")).Interface("applicant ID", appl.Name).Send()
 				return
 			}
@@ -81,7 +85,7 @@ func (s *Store) FIlterApplication(ctx context.Context, applicantList []*models.A
 			}
 
 			ch <- appl
-		}(appl)
+		}(applicant)
 	}
 
 	go func() {
@@ -89,12 +93,15 @@ func (s *Store) FIlterApplication(ctx context.Context, applicantList []*models.A
 		close(ch)
 	}()
 
-	for data:= range ch{
-		respo:= models.ApplicantRespo{
-			Name: data.Name,
+	for data := range ch {
+		respo := models.ApplicantRespo{
+			Name:  data.Name,
 			JobId: data.JobId,
 		}
 		response = append(response, &respo)
 	}
-	return response,nil
+	if response == nil {
+		log.Info().Err(errors.New("no candidates passed the requirments")).Send()
+	}
+	return response, nil
 }

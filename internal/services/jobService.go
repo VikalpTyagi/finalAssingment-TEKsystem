@@ -6,6 +6,7 @@ import (
 	"finalAssing/internal/models"
 )
 
+//@ modified according to new models
 func (s *Store) JobByCompanyId(jobs []models.JobReq, compId string) ([]models.JobRespo, error) {
 	listOfjobs, err := s.Repo.SaveJobsByCompanyId(jobs, compId)
 	if err != nil {

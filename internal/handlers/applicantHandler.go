@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"finalAssing/internal/middleware"
 	"finalAssing/internal/models"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -22,21 +23,23 @@ func (h *handler) AcceptApplicant(c *gin.Context) {
 	var newApplicant []*models.ApplicantReq
 
 	err := json.NewDecoder(c.Request.Body).Decode(&newApplicant)
+	fmt.Println("body after saving data", newApplicant)
 	if err != nil {
+		
 		log.Error().Err(err).Str("tracker Id", trackerId).Send()
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
 	validate := validator.New()
-	for _,data := range newApplicant{
+	for _, data := range newApplicant {
 		err = validate.Struct(data)
-	if err != nil {
-		log.Error().Err(err).Str("tracker Id", trackerId).Interface("body", newApplicant).Send()
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Error": "All fields are mandatory"})
-		return
+		if err != nil {
+			log.Error().Err(err).Str("tracker Id", trackerId).Interface("body", newApplicant).Send()
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Error": "All fields are mandatory"})
+			return
+		}
 	}
-	}
-	
+
 	filteredData, err := h.s.FIlterApplication(ctx, newApplicant)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
