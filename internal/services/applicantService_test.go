@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"finalAssing/internal/models"
 	"finalAssing/internal/repository"
 	"testing"
@@ -52,6 +53,30 @@ func TestStore_FIlterApplication(t *testing.T) {
 						Qualifications: []uint{1},
 						Shift:          "Day",
 					},
+					{
+						Name:           "ajay",
+						JobId:          1,
+						Experience:     3,
+						Max_NP:         2,
+						Budget:         600000,
+						Locations:      []uint{1, 2},
+						Stack:          []uint{1, 2, 3},
+						WorkMode:       "Full-Time",
+						Qualifications: []uint{1},
+						Shift:          "Day",
+					},
+					{
+						Name:           "Ramesh",
+						JobId:          1,
+						Experience:     3,
+						Max_NP:         2,
+						Budget:         40000,
+						Locations:      []uint{1, 2},
+						Stack:          []uint{1, 2, 3},
+						WorkMode:       "Full-Time",
+						Qualifications: []uint{1},
+						Shift:          "Day",
+					},
 				},
 			},
 			want: []*models.ApplicantRespo{
@@ -61,6 +86,10 @@ func TestStore_FIlterApplication(t *testing.T) {
 				},
 				{
 					Name:  "Satyam",
+					JobId: 1,
+				},
+				{
+					Name:  "Ramesh",
 					JobId: 1,
 				},
 			},
@@ -104,92 +133,134 @@ func TestStore_FIlterApplication(t *testing.T) {
 				}, nil
 			},
 		},
-		// {
-		// 	name: "Invalid job Id",
-		// 	args: args{
-		// 		ctx: context.Background(),
-		// 		applicantList: []*models.ApplicantReq{
-		// 			{
-		// 				Name:           "Vikalp Tyagi",
-		// 				JobId:          2,
-		// 				Experience:     3,
-		// 				Max_NP:         2,
-		// 				Budget:         50000,
-		// 				Locations:      []uint{1, 2},
-		// 				Stack:          []uint{1, 2, 3},
-		// 				WorkMode:       "Full-Time",
-		// 				Qualifications: []uint{1},
-		// 				Shift:          "Day",
-		// 			},
-		// 		},
-		// 	},
-		// 	want:    nil,
-		// 	wantErr: true,
-		// 	mockRepoResponse: func() (*models.Job, error) {
-		// 		return nil, errors.New("test error")
-		// 	},
-		// },
-		// {
-		// 	name: "budget not requirments met",
-		// 	args: args{
-		// 		ctx: context.Background(),
-		// 		applicantList: []*models.ApplicantReq{
-		// 			{
-		// 				Name:           "Vikalp Tyagi",
-		// 				JobId:          1,
-		// 				Experience:     3,
-		// 				Max_NP:         2,
-		// 				Budget:         50000,
-		// 				Locations:      []uint{1, 2},
-		// 				Stack:          []uint{1, 2, 3},
-		// 				WorkMode:       "Full-Time",
-		// 				Qualifications: []uint{1},
-		// 				Shift:          "Day",
-		// 			},
-		// 		},
-		// 	},
-		// 	want:    nil,
-		// 	wantErr: true,
-		// 	mockRepoResponse: func() (*models.Job, error) {
-		// 		return &models.Job{
-		// 			Experience: 4,
-		// 			MinExp:     1,
-		// 			Min_NP:     1,
-		// 			Max_NP:     4,
-		// 			Budget:     10000,
-		// 			Stack: []models.Skill{
-		// 				{
-		// 					Model: gorm.Model{ID: 1},
-		// 				},
-		// 				{
-		// 					Model: gorm.Model{ID: 2},
-		// 				},
-		// 				{
-		// 					Model: gorm.Model{ID: 3},
-		// 				},
-		// 			},
-		// 			Locations: []models.Location{
-		// 				{
-		// 					Model: gorm.Model{ID: 1},
-		// 				},
-		// 				{
-		// 					Model: gorm.Model{ID: 2},
-		// 				},
-		// 				{
-		// 					Model: gorm.Model{ID: 3},
-		// 				},
-		// 			},
-		// 			Qualifications: []models.Qualification{
-		// 				{
-		// 					Model: gorm.Model{ID: 1},
-		// 				},
-		// 			},
-		// 			WorkMode: "Full-Time",
-		// 			Shift:    "Day",
-		// 		}, nil
-		// 	},
-		// },
+		{
+			name: "Invalid job Id",
+			args: args{
+				ctx: context.Background(),
+				applicantList: []*models.ApplicantReq{
+					{
+						Name:           "Vikalp Tyagi",
+						JobId:          2,
+						Experience:     3,
+						Max_NP:         2,
+						Budget:         50000,
+						Locations:      []uint{1, 2},
+						Stack:          []uint{1, 2, 3},
+						WorkMode:       "Full-Time",
+						Qualifications: []uint{1},
+						Shift:          "Day",
+					},
+				},
+			},
+			want:    nil,
+			wantErr: false,
+			mockRepoResponse: func() (*models.Job, error) {
+				return nil, errors.New("tets error")
+			},
+		},
+
+		{
+			name: "budget requirments not met",
+			args: args{
+				ctx: context.Background(),
+				applicantList: []*models.ApplicantReq{
+					{
+						Name:           "Vikalp Tyagi",
+						JobId:          1,
+						Experience:     3,
+						Max_NP:         2,
+						Budget:         50000,
+						Locations:      []uint{1, 2},
+						Stack:          []uint{1, 2, 3},
+						WorkMode:       "Full-Time",
+						Qualifications: []uint{1},
+						Shift:          "Day",
+					},
+				},
+			},
+			want:    nil,
+			wantErr: false,
+			mockRepoResponse: func() (*models.Job, error) {
+				return nil, errors.New("hvjygfc")
+			},
+		},
+		{
+			name: "Experience requirments not met",
+			args: args{
+				ctx: context.Background(),
+				applicantList: []*models.ApplicantReq{
+					{
+						Name:           "Vikalp Tyagi",
+						JobId:          2,
+						Experience:     3,
+						Max_NP:         2,
+						Budget:         50000,
+						Locations:      []uint{1, 2},
+						Stack:          []uint{1, 2, 3},
+						WorkMode:       "Full-Time",
+						Qualifications: []uint{1},
+						Shift:          "Day",
+					},
+				},
+			},
+			want:    nil,
+			wantErr: false,
+			mockRepoResponse: func() (*models.Job, error) {
+				return &models.Job{}, errors.New("test error")
+			},
+		},
+		{
+			name: "multiple job id",
+			args: args{
+				ctx: context.Background(),
+				applicantList: []*models.ApplicantReq{
+					{ //* problem NP
+						Name:           "Vikalp Tyagi",
+						JobId:          1,
+						Experience:     3,
+						Max_NP:         8,
+						Budget:         50000,
+						Locations:      []uint{1, 2},
+						Stack:          []uint{1, 2, 3},
+						WorkMode:       "Full-Time",
+						Qualifications: []uint{1},
+						Shift:          "Day",
+					},
+					{//* problem : Shift
+						Name:           "Vikalp Tyagi",
+						JobId:          1,
+						Experience:     3,
+						Max_NP:         2,
+						Budget:         50000,
+						Locations:      []uint{1, 2},
+						Stack:          []uint{1, 2, 3},
+						WorkMode:       "Full-Time",
+						Qualifications: []uint{1},
+						Shift:          "Night",
+					},
+					{//* Problem: Workmode
+						Name:           "Vikalp Tyagi",
+						JobId:          1,
+						Experience:     3,
+						Max_NP:         2,
+						Budget:         50000,
+						Locations:      []uint{1, 2},
+						Stack:          []uint{1, 2, 3},
+						WorkMode:       "Full-Time",
+						Qualifications: []uint{1},
+						Shift:          "Day",
+					},
+				},
+			},
+			want:    nil,
+			wantErr: false,
+			mockRepoResponse: func() (*models.Job, error) {
+				return &models.Job{}, errors.New("test error")
+			},
+		},
+		
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mc := gomock.NewController(t)

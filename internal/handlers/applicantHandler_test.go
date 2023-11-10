@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/assert/v2"
 )
 
 func Test_handler_AcceptApplicant(t *testing.T) {
@@ -28,6 +29,9 @@ func Test_handler_AcceptApplicant(t *testing.T) {
 				s: ms,
 			}
 			h.AcceptApplicant(c)
+			assert.Equal(t,tt.args.expectedStatusCode,rr.Code)
+			assert.Equal(t,tt.args.ExpectedResponse,rr.Body.String())
+
 		})
 	}
 }
