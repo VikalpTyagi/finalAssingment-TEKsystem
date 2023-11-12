@@ -23,9 +23,8 @@ func (h *handler) AcceptApplicant(c *gin.Context) {
 
 	err := json.NewDecoder(c.Request.Body).Decode(&newApplicant)
 	if err != nil {
-
 		log.Error().Err(err).Str("tracker Id", trackerId).Send()
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": http.StatusText(http.StatusBadRequest)})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg2": http.StatusText(http.StatusBadRequest)})
 		return
 	}
 	validate := validator.New()

@@ -35,6 +35,22 @@ func Test_handler_AcceptApplicant(t *testing.T) {
 			ExpectedResponse:   `{"msg":"Internal Server Error"}`,
 		},
 		{
+			name: "Unccessful validation",
+			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
+				rr := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(rr)
+				httpRequest, _ := http.NewRequest(http.MethodPost, "http://test.com", bytes.NewBufferString(``))
+				ctx := httpRequest.Context()
+				ctx = context.WithValue(ctx, middleware.TrackerIdKey,"12")
+				httpRequest = httpRequest.WithContext(ctx)
+				c.Request = httpRequest
+
+				return c, rr, nil
+			},
+			expectedStatusCode: 400,
+			ExpectedResponse: `{"Error": "All fields are mandatory"}`,
+		},
+		{
 			name: "Invalid Request Body",
 			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
 				rr := httptest.NewRecorder()
@@ -45,12 +61,10 @@ func Test_handler_AcceptApplicant(t *testing.T) {
 				ctx = context.WithValue(ctx, auth.AuthKey, jwt.RegisteredClaims{})
 				httpRequest = httpRequest.WithContext(ctx)
 				c.Request = httpRequest
-				c.Params = append(c.Params, gin.Param{Key: "ID", Value: "123"})
-
 				return c, rr, nil
 			},
 			expectedStatusCode: 400,
-			ExpectedResponse: `{"msg":"Bad Request"}`,
+			ExpectedResponse: `{"msg2":"Bad Request"}`,
 		},
 	}
 	for _, tt := range tests {
