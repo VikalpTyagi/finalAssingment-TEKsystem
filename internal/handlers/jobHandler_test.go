@@ -74,7 +74,7 @@ func Test_handler_fetchJobById(t *testing.T) {
 				return c, rr, ms
 			},
 			expectedStatusCode: 200,
-			ExpectedResponse:   `{"ID":0,"CreatedAt":"0001-01-01T00:00:00Z","UpdatedAt":"0001-01-01T00:00:00Z","DeletedAt":null,"title":"","field":"","experience":0,"companyId":0}`,
+			ExpectedResponse:   `{"ID":0,"CreatedAt":"0001-01-01T00:00:00Z","UpdatedAt":"0001-01-01T00:00:00Z","DeletedAt":null,"title":"","field":"","experience":0,"min-NP":0,"max-NP":0,"salary":0,"locations":null,"skills":null,"workMode":"","desc":"","minExp":0,"qualification":null,"shift":"","companyId":0}`,
 		},
 	}
 	for _, tt := range tests {
@@ -157,14 +157,13 @@ func Test_handler_addJobsById(t *testing.T) {
 				c.Params = append(c.Params, gin.Param{Key: "ID", Value: "12"})
 				mc := gomock.NewController(t)
 				ms := services.NewMockService(mc)
-				ms.EXPECT().JobByCompanyId(gomock.Any(), gomock.Any()).Return([]models.Job{{
-					Name:  "GO dev",
-					Field: "IT",
+				ms.EXPECT().JobByCompanyId(gomock.Any(), gomock.Any()).Return([]models.JobRespo{{
+					Id: 1,
 				}}, nil).AnyTimes()
 				return c, rr, ms
 			},
 			expectedStatusCode: 201,
-			ExpectedResponse:   `[{"ID":0,"CreatedAt":"0001-01-01T00:00:00Z","UpdatedAt":"0001-01-01T00:00:00Z","DeletedAt":null,"title":"GO dev","field":"IT","experience":0,"companyId":0}]`,
+			ExpectedResponse:   `[{"Id":1}]`,
 		},
 	}
 	for _, tt := range tests {
@@ -219,7 +218,7 @@ func Test_handler_jobsByCompanyById(t *testing.T) {
 				return c, rr, ms
 			},
 			expectedStatusCode: 200,
-			ExpectedResponse:   `[{"ID":0,"CreatedAt":"0001-01-01T00:00:00Z","UpdatedAt":"0001-01-01T00:00:00Z","DeletedAt":null,"title":"GO dev","field":"IT","experience":0,"companyId":0}]`,
+			ExpectedResponse:   `[{"ID":0,"CreatedAt":"0001-01-01T00:00:00Z","UpdatedAt":"0001-01-01T00:00:00Z","DeletedAt":null,"title":"GO dev","field":"IT","experience":0,"min-NP":0,"max-NP":0,"salary":0,"locations":null,"skills":null,"workMode":"","desc":"","minExp":0,"qualification":null,"shift":"","companyId":0}]`,
 		},
 		{
 			name: "Invalid Company Id",
@@ -294,7 +293,7 @@ func Test_handler_ViewAllJobs(t *testing.T) {
 				return c, rr, ms
 			},
 			expectedStatusCode: 200,
-			ExpectedResponse:   `[{"ID":0,"CreatedAt":"0001-01-01T00:00:00Z","UpdatedAt":"0001-01-01T00:00:00Z","DeletedAt":null,"title":"GO dev","field":"IT","experience":0,"companyId":0}]`,
+			ExpectedResponse:   `[{"ID":0,"CreatedAt":"0001-01-01T00:00:00Z","UpdatedAt":"0001-01-01T00:00:00Z","DeletedAt":null,"title":"GO dev","field":"IT","experience":0,"min-NP":0,"max-NP":0,"salary":0,"locations":null,"skills":null,"workMode":"","desc":"","minExp":0,"qualification":null,"shift":"","companyId":0}]`,
 		},
 		{
 			name: "Invalid Company Id",

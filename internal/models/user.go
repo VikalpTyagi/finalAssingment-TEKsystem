@@ -35,7 +35,7 @@ type ApplicantReq struct {
 	Name           string `json:"name" validate:"required"`
 	JobId          uint   `json:"job" validate:"required"`
 	Experience     uint   `json:"experience" validate:"required"`
-	Max_NP         uint   `json:"max-NP" validate:"required"`
+	Max_NP         uint   `json:"noticePeriode" validate:"required"`
 	Budget         uint   `json:"salary" validate:"required"`
 	Locations      []uint `json:"locations" validate:"required" `
 	Stack          []uint `json:"skills" validate:"required" `

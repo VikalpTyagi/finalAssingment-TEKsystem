@@ -81,7 +81,7 @@ func (s *Store) Filter(appl *models.ApplicantReq) {
 		log.Error().Err(errors.New("qualification requirments not met")).Interface("applicant ID", appl.Name).Send()
 		return
 	}
-	var available bool
+	available := false 
 	for _, j := range jobData.Locations {
 		for _, a := range appl.Locations {
 			if j.Model.ID == a {
