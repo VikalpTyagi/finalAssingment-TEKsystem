@@ -78,7 +78,7 @@ func TestStore_FIlterApplication(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockInterface := repository.NewMockRepoInterface(mc)
-			mockInterface.EXPECT().ApplicantsFilter(gomock.Any()).Return(tt.mockRepoResponse()).AnyTimes()
+			// mockInterface.EXPECT().ApplicantsFilter(gomock.Any()).Return(tt.mockRepoResponse()).AnyTimes()
 			s := NewStore(mockInterface)
 
 			got, err := s.FIlterApplication(tt.args.ctx, tt.args.applicantList)
