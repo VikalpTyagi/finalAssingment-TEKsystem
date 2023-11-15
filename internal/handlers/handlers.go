@@ -2,22 +2,31 @@ package handlers
 
 import (
 	"finalAssing/internal/auth"
+	"finalAssing/internal/cacheier"
 	"finalAssing/internal/middleware"
 	"finalAssing/internal/repository"
 	"finalAssing/internal/services"
 	"fmt"
 	"net/http"
 
+	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 
 	"github.com/gin-gonic/gin"
 )
 
-func API(a *auth.Auth, c *repository.ReposStruct) *gin.Engine {
+func API(a *auth.Auth, c *repository.ReposStruct, red *redis.Client) *gin.Engine {
 
 	ginEngine := gin.New()
 	mid, err := middleware.NewMid(a)
-	ms := services.NewStore(c)
+	if err != nil {
+		panic(err) 
+	}
+	redConn,err := cacheier.NewRedConn(red)
+	if err != nil {
+		panic(err) 
+	}
+	ms := services.NewStore(c, redConn)
 	h := handler{
 		s: ms,
 		a: a,
@@ -40,7 +49,7 @@ func API(a *auth.Auth, c *repository.ReposStruct) *gin.Engine {
 	ginEngine.GET("/api/companies/:ID/jobs", h.jobsByCompanyById)
 	ginEngine.GET("/api/jobs", h.ViewAllJobs)
 
-	ginEngine.POST("api/applicant",h.AcceptApplicant)
+	ginEngine.POST("api/applicant", h.AcceptApplicant)
 
 	return ginEngine
 }

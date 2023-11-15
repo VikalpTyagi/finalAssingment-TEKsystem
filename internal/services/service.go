@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"finalAssing/internal/cacheier"
 	"finalAssing/internal/models"
 	"finalAssing/internal/repository"
 
@@ -26,8 +27,9 @@ type Service interface {
 
 type Store struct {
 	Repo repository.RepoInterface
+	Cache *cacheier.RedisConn
 }
 
-func NewStore(repo repository.RepoInterface) *Store {
-	return &Store{Repo: repo}
+func NewStore(repo repository.RepoInterface, redis *cacheier.RedisConn) *Store {
+	return &Store{Repo: repo, Cache: redis}
 }

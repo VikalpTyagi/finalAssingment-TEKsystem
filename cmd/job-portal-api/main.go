@@ -85,6 +85,8 @@ func startApp() error {
 	if err != nil {
 		return err
 	}
+	// Intializing redis connection
+	redis := database.NewRedis()
 
 	// Initialize http service
 	api := http.Server{
@@ -92,7 +94,7 @@ func startApp() error {
 		ReadTimeout:  8000 * time.Second,
 		WriteTimeout: 800 * time.Second,
 		IdleTimeout:  800 * time.Second,
-		Handler:      handlers.API(a, repoStruct),
+		Handler:      handlers.API(a, repoStruct, redis),
 	}
 
 	serverErrors := make(chan error, 1)
