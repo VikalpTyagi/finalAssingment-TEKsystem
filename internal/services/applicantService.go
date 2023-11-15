@@ -43,6 +43,7 @@ func (s *Store) FIlterApplication(ctx context.Context, applicantList []*models.A
 }
 
 func (s *Store) Filter(appl *models.ApplicantReq) {
+
 	jobData, err := s.Repo.ApplicantsFilter(appl.JobId) //@ fetching job data
 	if err != nil {
 		log.Error().Err(err).Interface("Job ID", appl.JobId).Send()
@@ -68,10 +69,6 @@ func (s *Store) Filter(appl *models.ApplicantReq) {
 		log.Error().Err(errors.New("work mode requirments not met")).Interface("applicant ID", appl.Name).Send()
 		return
 	}
-	if jobData.WorkMode != appl.WorkMode {
-		log.Error().Err(errors.New("work mode requirments not met")).Interface("applicant ID", appl.Name).Send()
-		return
-	}
 	var passed bool
 	for _, j := range jobData.Qualifications {
 		for _, a := range appl.Qualifications {
@@ -84,7 +81,7 @@ func (s *Store) Filter(appl *models.ApplicantReq) {
 		log.Error().Err(errors.New("qualification requirments not met")).Interface("applicant ID", appl.Name).Send()
 		return
 	}
-	var available bool
+	available := false 
 	for _, j := range jobData.Locations {
 		for _, a := range appl.Locations {
 			if j.Model.ID == a {

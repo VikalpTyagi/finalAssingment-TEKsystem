@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"finalAssing/internal/middleware"
 	"finalAssing/internal/models"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -23,11 +22,9 @@ func (h *handler) AcceptApplicant(c *gin.Context) {
 	var newApplicant []*models.ApplicantReq
 
 	err := json.NewDecoder(c.Request.Body).Decode(&newApplicant)
-	fmt.Println("body after saving data", newApplicant)
 	if err != nil {
-		
 		log.Error().Err(err).Str("tracker Id", trackerId).Send()
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg2": http.StatusText(http.StatusBadRequest)})
 		return
 	}
 	validate := validator.New()

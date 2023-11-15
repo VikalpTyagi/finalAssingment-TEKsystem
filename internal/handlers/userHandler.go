@@ -19,34 +19,27 @@ type handler struct {
 	a *auth.Auth
 }
 
-// Signup is a method for the handler struct which handles user registration
 func (h *handler) Signup(c *gin.Context) {
 	ctx := c.Request.Context()
 	traceId, ok := ctx.Value(middleware.TrackerIdKey).(string)
 	if !ok {
-		// If the traceId isn't found in the request, log an error and return
 		log.Error().Msg("traceId missing from context")
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
 
-	// Define a NewUser variable
 	var nu models.NewUser
 
-	// Attempt to decode JSON from the request body into the NewUser variable
 	err := json.NewDecoder(c.Request.Body).Decode(&nu)
 	if err != nil {
-		// If there is an error in decoding, log the error and return
 		log.Error().Err(err).Str("tracker Id", traceId)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg in decoder": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
 
-	// Create a new validator and validate the NewUser variable
 	validate := validator.New()
 	err = validate.Struct(nu)
 	if err != nil {
-		// If validation fails, log the error and return
 		log.Error().Err(err).Str("tracker Id", traceId).Send()
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": "please provide Name, Email and Password"})
 		return
