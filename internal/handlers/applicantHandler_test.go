@@ -6,7 +6,6 @@ import (
 	"finalAssing/internal/auth"
 	"finalAssing/internal/middleware"
 	"finalAssing/internal/models"
-	"finalAssing/internal/repository"
 	"finalAssing/internal/services"
 	"net/http"
 	"net/http/httptest"
@@ -16,7 +15,6 @@ import (
 	"github.com/go-playground/assert/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"go.uber.org/mock/gomock"
-	"gorm.io/gorm"
 )
 
 func Test_handler_AcceptApplicant(t *testing.T) {
@@ -124,121 +122,18 @@ func Test_handler_AcceptApplicant(t *testing.T) {
 				c.Request = httpRequest
 
 				mc := gomock.NewController(t)
-				mockInterface := repository.NewMockRepoInterface(mc)
-				ms := services.NewStore(mockInterface)
-				mockInterface.EXPECT().ApplicantsFilter(gomock.Any()).Return(&models.Job{
-					Experience: 4,
-					MinExp:     1,
-					Min_NP:     1,
-					Max_NP:     4,
-					Budget:     80000,
-					Stack: []models.Skill{
-						{
-							Model: gorm.Model{ID: 1},
-						},
-						{
-							Model: gorm.Model{ID: 2},
-						},
-						{
-							Model: gorm.Model{ID: 3},
-						},
-					},
-					Locations: []models.Location{
-						{
-							Model: gorm.Model{ID: 1},
-						},
-						{
-							Model: gorm.Model{ID: 2},
-						},
-						{
-							Model: gorm.Model{ID: 3},
-						},
-					},
-					Qualifications: []models.Qualification{
-						{
-							Model: gorm.Model{ID: 1},
-						},
-					},
-					WorkMode: "Full-Time",
-					Shift:    "Day",
-				}, nil).Times(2)
+				ms := services.NewMockService(mc)
+				ms.EXPECT().FIlterApplication(ctx, gomock.Any()).Return([]*models.ApplicantRespo{
+					{
+						Name:  "Vikalp Tyagi",
+						JobId: 1,
+					}}, nil).AnyTimes()
 
 				return c, rr, ms
 			},
 			expectedStatusCode: 200,
 			ExpectedResponse:   `[{"Name":"Vikalp Tyagi","JobId":1}]`,
 		},
-		// {
-		// 	name: "Unsuccess Case",
-		// 	setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
-		// 		rr := httptest.NewRecorder()
-		// 		c, _ := gin.CreateTestContext(rr)
-		// 		httpRequest, _ := http.NewRequest(http.MethodPost, "http://test.com:8080", bytes.NewBufferString(`
-		// 		[
-		// 			{
-		// 				"name": "Akash",
-		// 				"job": 1,
-		// 				"experience": 3,
-		// 				"noticePeriode": 2,
-		// 				"salary": 90000,
-		// 				"locations": [1, 2, 3],
-		// 				"skills": [1, 2, 3],
-		// 				"WorkMode": "Full-Time",
-		// 				"qualification": [1],
-		// 				"Shift": "Day"
-		// 			}
-		// 		]
-		// 		`))
-		// 		ctx := httpRequest.Context()
-		// 		ctx = context.WithValue(ctx, middleware.TrackerIdKey, "12")
-		// 		httpRequest = httpRequest.WithContext(ctx)
-		// 		c.Request = httpRequest
-
-		// 		mc := gomock.NewController(t)
-		// 		mockInterface := repository.NewMockRepoInterface(mc)
-		// 		ms := services.NewStore(mockInterface)
-		// 		mockInterface.EXPECT().ApplicantsFilter(gomock.Any()).Return(&models.Job{
-		// 			Experience: 4,
-		// 			MinExp:     1,
-		// 			Min_NP:     1,
-		// 			Max_NP:     4,
-		// 			Budget:     80000,
-		// 			Stack: []models.Skill{
-		// 				{
-		// 					Model: gorm.Model{ID: 1},
-		// 				},
-		// 				{
-		// 					Model: gorm.Model{ID: 2},
-		// 				},
-		// 				{
-		// 					Model: gorm.Model{ID: 3},
-		// 				},
-		// 			},
-		// 			Locations: []models.Location{
-		// 				{
-		// 					Model: gorm.Model{ID: 1},
-		// 				},
-		// 				{
-		// 					Model: gorm.Model{ID: 2},
-		// 				},
-		// 				{
-		// 					Model: gorm.Model{ID: 3},
-		// 				},
-		// 			},
-		// 			Qualifications: []models.Qualification{
-		// 				{
-		// 					Model: gorm.Model{ID: 1},
-		// 				},
-		// 			},
-		// 			WorkMode: "Full-Time",
-		// 			Shift:    "Day",
-		// 		}, nil).Times(2)
-
-		// 		return c, rr, ms
-		// 	},
-		// 	expectedStatusCode: 500,
-		// 	ExpectedResponse:   `{"msg":"Internal Server Error}`,
-		// },
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

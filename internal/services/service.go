@@ -20,16 +20,16 @@ type Service interface {
 	ViewCompanies(ctx context.Context) ([]models.Company, error)
 	CreateCompany(ctx context.Context, newComp models.Company) (models.Company, error)
 	CreateUser(ctx context.Context, nu models.NewUser) (models.User, error)
-	Authenticate(ctx context.Context, email, password string) (jwt.RegisteredClaims,error)
+	Authenticate(ctx context.Context, email, password string) (jwt.RegisteredClaims, error)
 
-	FIlterApplication(ctx context.Context,applicantList []*models.ApplicantReq) ([]*models.ApplicantRespo,error)
+	FIlterApplication(ctx context.Context, applicantList []*models.ApplicantReq) ([]*models.ApplicantRespo, error)
 }
 
 type Store struct {
-	Repo repository.RepoInterface
-	Cache *cacheier.RedisConn
+	Repo  repository.RepoInterface
+	Cache cacheier.RedInterface
 }
 
-func NewStore(repo repository.RepoInterface, redis *cacheier.RedisConn) *Store {
+func NewStore(repo repository.RepoInterface, redis cacheier.RedInterface) Service {
 	return &Store{Repo: repo, Cache: redis}
 }

@@ -88,7 +88,7 @@ func TestStore_CreateUser(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockInterface := repository.NewMockRepoInterface(mc)
 			mockInterface.EXPECT().SaveUser(tt.args.ctx, tt.args.nu).Return(tt.mockRepoResponse()).AnyTimes()
-			s := NewStore(mockInterface)
+			s := NewStore(mockInterface,nil)
 			got, err := s.CreateUser(tt.args.ctx, tt.args.nu)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Store.CreateUser() error = %v, wantErr %v", err, tt.wantErr)
@@ -134,7 +134,7 @@ func TestStore_Authenticate(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockInterface := repository.NewMockRepoInterface(mc)
 			mockInterface.EXPECT().CheckEmail(tt.args.email, tt.args.password).Return(tt.mockRepoResponse()).AnyTimes()
-			s := NewStore(mockInterface)
+			s := NewStore(mockInterface,nil)
 			got, err := s.Authenticate(tt.args.ctx, tt.args.email, tt.args.password)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Store.Authenticate() error = %v, wantErr %v", err, tt.wantErr)

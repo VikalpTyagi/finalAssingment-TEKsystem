@@ -47,7 +47,7 @@ func (s *Store) FIlterApplication(ctx context.Context, applicantList []*models.A
 
 func (s *Store) Filter(ctx context.Context, appl *models.ApplicantReq) error {
 
-	// jobData, err := s.Repo.ApplicantsFilter(appl.JobId) //@ fetching job data
+	// jobData, err := s.Repo.GetJobRequirment(appl.JobId) //@ fetching job data
 	jobData, err := s.fetchJobData(ctx, appl.JobId)
 	if err != nil {
 		log.Error().Err(err).Interface("Job ID", appl.JobId).Send()
@@ -116,7 +116,7 @@ func (s *Store) Filter(ctx context.Context, appl *models.ApplicantReq) error {
 func (s *Store) fetchJobData(ctx context.Context, jobId uint) (*models.Job, error) {
 	data, err := s.Cache.FetchJobData(ctx, jobId)
 	if err != nil {
-		data, err = s.Repo.ApplicantsFilter(jobId)
+		data, err = s.Repo.GetJobRequirment(jobId)
 		if err != nil {
 			return nil, err
 		}

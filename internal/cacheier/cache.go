@@ -17,12 +17,14 @@ type RedisConn struct {
 	red *redis.Client
 }
 
-type redInterface interface {
+//go:generate mockgen -source cache.go -destination cache_mock.go -package cacheier
+
+type RedInterface interface {
 	AddJobData(ctx context.Context, jobId uint, jobData *models.Job) error
 	FetchJobData(ctx context.Context, jobId uint) (*models.Job, error)
 }
 
-func NewRedConn(client *redis.Client) (*RedisConn, error) {
+func NewRedConn(client *redis.Client) (RedInterface, error) {
 	if client == nil {
 		return nil, errors.New("redis client not provided")
 	}

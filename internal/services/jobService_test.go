@@ -96,7 +96,7 @@ func TestStore_JobByCompanyId(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockInterface := repository.NewMockRepoInterface(mc)
 			mockInterface.EXPECT().SaveJobsByCompanyId(tt.args.jobs, tt.args.compId).Return(tt.mockRepoResponse()).AnyTimes()
-			s := NewStore(mockInterface)
+			s := NewStore(mockInterface,nil)
 			got, err := s.JobByCompanyId(tt.args.jobs, tt.args.compId)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Store.JobByCompanyId() error = %v, wantErr %v", err, tt.wantErr)
@@ -190,7 +190,7 @@ func TestStore_FetchJobByCompanyId(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockInterface := repository.NewMockRepoInterface(mc)
 			mockInterface.EXPECT().GetJobsByCId(tt.args.ctx, tt.args.companyId).Return(tt.mockRepoResponse()).AnyTimes()
-			s := NewStore(mockInterface)
+			s := NewStore(mockInterface,nil)
 			got, err := s.FetchJobByCompanyId(tt.args.ctx, tt.args.companyId)
 
 			if (err != nil) != tt.wantErr {
@@ -269,7 +269,7 @@ func TestStore_GetJobById(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockInterface := repository.NewMockRepoInterface(mc)
 			mockInterface.EXPECT().FetchByJobId(tt.args.ctx, tt.args.jobId).Return(tt.mockRepoResponse()).AnyTimes()
-			s := NewStore(mockInterface)
+			s := NewStore(mockInterface,nil)
 			got, err := s.GetJobById(tt.args.ctx, tt.args.jobId)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Store.GetJobById() error = %v, wantErr %v", err, tt.wantErr)
@@ -348,7 +348,7 @@ func TestStore_GetAllJobs(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockInterface := repository.NewMockRepoInterface(mc)
 			mockInterface.EXPECT().FetchAllJobs(tt.args.ctx).Return(tt.mockRepoResponse()).AnyTimes()
-			s := NewStore(mockInterface)
+			s := NewStore(mockInterface,nil)
 			got, err := s.GetAllJobs(tt.args.ctx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Store.GetAllJobs() error = %v, wantErr %v", err, tt.wantErr)

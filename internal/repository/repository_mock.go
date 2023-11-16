@@ -39,19 +39,19 @@ func (m *MockRepoInterface) EXPECT() *MockRepoInterfaceMockRecorder {
 	return m.recorder
 }
 
-// ApplicantsFilter mocks base method.
-func (m *MockRepoInterface) ApplicantsFilter(jobId uint) (*models.Job, error) {
+// GetJobRequirment mocks base method.
+func (m *MockRepoInterface) GetJobRequirment(jobId uint) (*models.Job, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ApplicantsFilter", jobId)
+	ret := m.ctrl.Call(m, "GetJobRequirment", jobId)
 	ret0, _ := ret[0].(*models.Job)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ApplicantsFilter indicates an expected call of ApplicantsFilter.
-func (mr *MockRepoInterfaceMockRecorder) ApplicantsFilter(jobId any) *gomock.Call {
+// GetJobRequirment indicates an expected call of GetJobRequirment.
+func (mr *MockRepoInterfaceMockRecorder) GetJobRequirment(jobId any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplicantsFilter", reflect.TypeOf((*MockRepoInterface)(nil).ApplicantsFilter), jobId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetJobRequirment", reflect.TypeOf((*MockRepoInterface)(nil).GetJobRequirment), jobId)
 }
 
 // CheckEmail mocks base method.
