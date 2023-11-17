@@ -2,12 +2,14 @@ package handlers
 
 import (
 	"encoding/json"
+	"finalAssing/internal/auth"
 	"finalAssing/internal/middleware"
 	"finalAssing/internal/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/rs/zerolog/log"
 )
 
@@ -17,6 +19,13 @@ func (h *handler) RegisterCompany(c *gin.Context) {
 	if !ok {
 		log.Error().Msg("TrackerId missing from context")
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
+		return
+	}
+
+	_, ok = ctx.Value(auth.AuthKey).(jwt.RegisteredClaims)
+	if !ok {
+		log.Error().Str("Traker Id", trackerId).Msg("login first")
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": http.StatusText(http.StatusUnauthorized)})
 		return
 	}
 
@@ -37,7 +46,6 @@ func (h *handler) RegisterCompany(c *gin.Context) {
 		return
 	}
 
-
 	Comp, err := h.s.CreateCompany(ctx, newComp)
 	if err != nil {
 		log.Error().Err(err).Str("tracker Id", trackerId).Msg("company registration problem")
@@ -47,12 +55,18 @@ func (h *handler) RegisterCompany(c *gin.Context) {
 	c.JSON(http.StatusCreated, Comp)
 }
 
-func (h *handler) fetchListOfCompany(c *gin.Context){
+func (h *handler) fetchListOfCompany(c *gin.Context) {
 	ctx := c.Request.Context()
 	trackerId, ok := ctx.Value(middleware.TrackerIdKey).(string)
 	if !ok {
 		log.Error().Msg("traceId missing from context")
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
+		return
+	}
+	_, ok = ctx.Value(auth.AuthKey).(jwt.RegisteredClaims)
+	if !ok {
+		log.Error().Str("Traker Id", trackerId).Msg("login first")
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": http.StatusText(http.StatusUnauthorized)})
 		return
 	}
 	listComp, err := h.s.ViewCompanies(ctx)
@@ -64,16 +78,22 @@ func (h *handler) fetchListOfCompany(c *gin.Context){
 	c.JSON(http.StatusOK, listComp)
 }
 
-func (h *handler) companyById(c *gin.Context){
-	ctx:= c.Request.Context()
+func (h *handler) companyById(c *gin.Context) {
+	ctx := c.Request.Context()
 	trackerId, ok := ctx.Value(middleware.TrackerIdKey).(string)
 	if !ok {
 		log.Error().Msg("TrackerId missing from context")
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
-	companyId:= c.Param("ID")
-	compData,err :=h.s.FetchCompanyByID(ctx,companyId)
+	_, ok = ctx.Value(auth.AuthKey).(jwt.RegisteredClaims)
+	if !ok {
+		log.Error().Str("Traker Id", trackerId).Msg("login first")
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": http.StatusText(http.StatusUnauthorized)})
+		return
+	}
+	companyId := c.Param("ID")
+	compData, err := h.s.FetchCompanyByID(ctx, companyId)
 	if err != nil {
 		log.Error().Err(err).Str("Tracker Id", trackerId)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": "problem in viewing list of company by ID"})

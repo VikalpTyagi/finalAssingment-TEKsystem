@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"finalAssing/internal/auth"
 	"finalAssing/internal/middleware"
 	"finalAssing/internal/models"
 	"finalAssing/internal/services"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/assert/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"go.uber.org/mock/gomock"
 )
 
@@ -37,6 +39,22 @@ func Test_handler_fetchJobById(t *testing.T) {
 			ExpectedResponse:   `{"msg":"Internal Server Error"}`,
 		},
 		{
+			name: "missing jwt claims",
+			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
+				rr := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(rr)
+				httpRequest, _ := http.NewRequest(http.MethodGet, "http://test.com", nil)
+				ctx := httpRequest.Context()
+				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "123")
+				httpRequest = httpRequest.WithContext(ctx)
+				c.Request = httpRequest
+
+				return c, rr, nil
+			},
+			expectedStatusCode: http.StatusUnauthorized,
+			ExpectedResponse:   `{"error":"Unauthorized"}`,
+		},
+		{
 			name: "Invalid Job Id",
 			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
 				rr := httptest.NewRecorder()
@@ -44,6 +62,7 @@ func Test_handler_fetchJobById(t *testing.T) {
 				httpRequest, _ := http.NewRequest(http.MethodGet, "http://test.com:8080/12", nil)
 				ctx := httpRequest.Context()
 				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "123")
+				ctx = context.WithValue(ctx, auth.AuthKey, jwt.RegisteredClaims{})
 				httpRequest = httpRequest.WithContext(ctx)
 				c.Request = httpRequest
 				c.Params = append(c.Params, gin.Param{Key: "ID", Value: "ab2"})
@@ -64,6 +83,7 @@ func Test_handler_fetchJobById(t *testing.T) {
 				httpRequest, _ := http.NewRequest(http.MethodGet, "http://test.com:8080/12", nil)
 				ctx := httpRequest.Context()
 				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "123")
+				ctx = context.WithValue(ctx, auth.AuthKey, jwt.RegisteredClaims{})
 				httpRequest = httpRequest.WithContext(ctx)
 				c.Request = httpRequest
 				c.Params = append(c.Params, gin.Param{Key: "ID", Value: "786"})
@@ -110,6 +130,22 @@ func Test_handler_addJobsById(t *testing.T) {
 			ExpectedResponse:   `{"msg":"Internal Server Error"}`,
 		},
 		{
+			name: "missing jwt claims",
+			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
+				rr := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(rr)
+				httpRequest, _ := http.NewRequest(http.MethodGet, "http://test.com", nil)
+				ctx := httpRequest.Context()
+				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "123")
+				httpRequest = httpRequest.WithContext(ctx)
+				c.Request = httpRequest
+
+				return c, rr, nil
+			},
+			expectedStatusCode: http.StatusUnauthorized,
+			ExpectedResponse:   `{"error":"Unauthorized"}`,
+		},
+		{
 			name: "body data invalid",
 			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
 				rr := httptest.NewRecorder()
@@ -117,6 +153,7 @@ func Test_handler_addJobsById(t *testing.T) {
 				httpRequest, _ := http.NewRequest(http.MethodPost, "http://test.com:8080/12", bytes.NewBufferString(`ghjdsfg`))
 				ctx := httpRequest.Context()
 				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "123")
+				ctx = context.WithValue(ctx, auth.AuthKey, jwt.RegisteredClaims{})
 				httpRequest = httpRequest.WithContext(ctx)
 				c.Request = httpRequest
 				return c, rr, nil
@@ -132,6 +169,7 @@ func Test_handler_addJobsById(t *testing.T) {
 				httpRequest, _ := http.NewRequest(http.MethodPost, "http://test.com:8080/12", bytes.NewBufferString(`[]`))
 				ctx := httpRequest.Context()
 				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "123")
+				ctx = context.WithValue(ctx, auth.AuthKey, jwt.RegisteredClaims{})
 				httpRequest = httpRequest.WithContext(ctx)
 				c.Request = httpRequest
 				c.Params = append(c.Params, gin.Param{Key: "ID", Value: "12"})
@@ -152,6 +190,7 @@ func Test_handler_addJobsById(t *testing.T) {
 				httpRequest, _ := http.NewRequest(http.MethodPost, "http://test.com:8080", bytes.NewBufferString(`[]`))
 				ctx := httpRequest.Context()
 				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "123")
+				ctx = context.WithValue(ctx, auth.AuthKey, jwt.RegisteredClaims{})
 				httpRequest = httpRequest.WithContext(ctx)
 				c.Request = httpRequest
 				c.Params = append(c.Params, gin.Param{Key: "ID", Value: "12"})
@@ -199,6 +238,22 @@ func Test_handler_jobsByCompanyById(t *testing.T) {
 			ExpectedResponse:   `{"msg":"Internal Server Error"}`,
 		},
 		{
+			name: "missing jwt claims",
+			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
+				rr := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(rr)
+				httpRequest, _ := http.NewRequest(http.MethodGet, "http://test.com", nil)
+				ctx := httpRequest.Context()
+				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "123")
+				httpRequest = httpRequest.WithContext(ctx)
+				c.Request = httpRequest
+
+				return c, rr, nil
+			},
+			expectedStatusCode: http.StatusUnauthorized,
+			ExpectedResponse:   `{"error":"Unauthorized"}`,
+		},
+		{
 			name: "Successful",
 			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
 				rr := httptest.NewRecorder()
@@ -206,6 +261,7 @@ func Test_handler_jobsByCompanyById(t *testing.T) {
 				httpRequest, _ := http.NewRequest(http.MethodPost, "http://test.com:8080", bytes.NewBufferString(`[]`))
 				ctx := httpRequest.Context()
 				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "123")
+				ctx = context.WithValue(ctx, auth.AuthKey, jwt.RegisteredClaims{})
 				httpRequest = httpRequest.WithContext(ctx)
 				c.Request = httpRequest
 				c.Params = append(c.Params, gin.Param{Key: "ID", Value: "12"})
@@ -228,6 +284,7 @@ func Test_handler_jobsByCompanyById(t *testing.T) {
 				httpRequest, _ := http.NewRequest(http.MethodPost, "http://test.com:8080", bytes.NewBufferString(`[]`))
 				ctx := httpRequest.Context()
 				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "123")
+				ctx = context.WithValue(ctx, auth.AuthKey, jwt.RegisteredClaims{})
 				httpRequest = httpRequest.WithContext(ctx)
 				c.Request = httpRequest
 				c.Params = append(c.Params, gin.Param{Key: "Id", Value: "23"})
@@ -255,9 +312,9 @@ func Test_handler_jobsByCompanyById(t *testing.T) {
 }
 
 func Test_handler_ViewAllJobs(t *testing.T) {
-	
+
 	tests := []struct {
-		name string
+		name               string
 		setup              func() (*gin.Context, *httptest.ResponseRecorder, services.Service)
 		expectedStatusCode int
 		ExpectedResponse   string
@@ -274,6 +331,22 @@ func Test_handler_ViewAllJobs(t *testing.T) {
 			ExpectedResponse:   `{"msg":"Internal Server Error"}`,
 		},
 		{
+			name: "missing jwt claims",
+			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
+				rr := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(rr)
+				httpRequest, _ := http.NewRequest(http.MethodGet, "http://test.com", nil)
+				ctx := httpRequest.Context()
+				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "123")
+				httpRequest = httpRequest.WithContext(ctx)
+				c.Request = httpRequest
+
+				return c, rr, nil
+			},
+			expectedStatusCode: http.StatusUnauthorized,
+			ExpectedResponse:   `{"error":"Unauthorized"}`,
+		},
+		{
 			name: "Successful",
 			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
 				rr := httptest.NewRecorder()
@@ -281,6 +354,7 @@ func Test_handler_ViewAllJobs(t *testing.T) {
 				httpRequest, _ := http.NewRequest(http.MethodPost, "http://test.com:8080", bytes.NewBufferString(`[]`))
 				ctx := httpRequest.Context()
 				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "123")
+				ctx = context.WithValue(ctx,auth.AuthKey,jwt.RegisteredClaims{})
 				httpRequest = httpRequest.WithContext(ctx)
 				c.Request = httpRequest
 				c.Params = append(c.Params, gin.Param{Key: "ID", Value: "12"})
@@ -303,6 +377,7 @@ func Test_handler_ViewAllJobs(t *testing.T) {
 				httpRequest, _ := http.NewRequest(http.MethodPost, "http://test.com:8080", bytes.NewBufferString(`[]`))
 				ctx := httpRequest.Context()
 				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "123")
+				ctx = context.WithValue(ctx,auth.AuthKey,jwt.RegisteredClaims{})
 				httpRequest = httpRequest.WithContext(ctx)
 				c.Request = httpRequest
 				c.Params = append(c.Params, gin.Param{Key: "Id", Value: "23"})
@@ -317,13 +392,13 @@ func Test_handler_ViewAllJobs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c,rr,ms:=tt.setup()
+			c, rr, ms := tt.setup()
 			h := &handler{
 				s: ms,
 			}
 			h.ViewAllJobs(c)
-			assert.Equal(t,tt.expectedStatusCode,rr.Code)
-			assert.Equal(t,tt.ExpectedResponse,rr.Body.String())
+			assert.Equal(t, tt.expectedStatusCode, rr.Code)
+			assert.Equal(t, tt.ExpectedResponse, rr.Body.String())
 		})
 	}
 }

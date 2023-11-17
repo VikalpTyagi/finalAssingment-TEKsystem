@@ -88,7 +88,7 @@ func TestStore_CreateUser(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockInterface := repository.NewMockRepoInterface(mc)
 			mockInterface.EXPECT().SaveUser(tt.args.ctx, tt.args.nu).Return(tt.mockRepoResponse()).AnyTimes()
-			s := NewStore(mockInterface,nil)
+			s := NewStore(mockInterface, nil)
 			got, err := s.CreateUser(tt.args.ctx, tt.args.nu)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Store.CreateUser() error = %v, wantErr %v", err, tt.wantErr)
@@ -128,13 +128,44 @@ func TestStore_Authenticate(t *testing.T) {
 				return models.User{}, errors.New("repository error")
 			},
 		},
+		{
+			name: "Error: Incorrect Password",
+			args: args{
+				ctx:      context.Background(),
+				email:    "ram@gmail.com",
+				password: "WrongPassword",
+			},
+			want:    jwt.RegisteredClaims{},
+			wantErr: true,
+			mockRepoResponse: func() (models.User, error) {
+				return models.User{
+					Name:     "Ram",
+					Email:    "ram@gmail.com",
+					PassHash: "hashed-password",
+				}, nil
+			},
+		},
+		// Test case for empty email or password
+		{
+			name: "Error: Empty Email or Password",
+			args: args{
+				ctx:      context.Background(),
+				email:    "",
+				password: "Pass@123",
+			},
+			want:    jwt.RegisteredClaims{},
+			wantErr: true,
+			mockRepoResponse: func() (models.User, error) {
+				return models.User{}, errors.New("empty email or password")
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockInterface := repository.NewMockRepoInterface(mc)
 			mockInterface.EXPECT().CheckEmail(tt.args.email, tt.args.password).Return(tt.mockRepoResponse()).AnyTimes()
-			s := NewStore(mockInterface,nil)
+			s := NewStore(mockInterface, nil)
 			got, err := s.Authenticate(tt.args.ctx, tt.args.email, tt.args.password)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Store.Authenticate() error = %v, wantErr %v", err, tt.wantErr)

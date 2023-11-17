@@ -3,12 +3,14 @@ package handlers
 
 import (
 	"encoding/json"
+	"finalAssing/internal/auth"
 	"finalAssing/internal/middleware"
 	"finalAssing/internal/models"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/rs/zerolog/log"
 )
 
@@ -20,6 +22,13 @@ func (h *handler) addJobsById(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
+	_, ok = ctx.Value(auth.AuthKey).(jwt.RegisteredClaims)
+	if !ok {
+		log.Error().Str("Traker Id", trackerId).Msg("login first")
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": http.StatusText(http.StatusUnauthorized)})
+		return
+	}
+
 	compId := c.Param("ID")
 	var jobs []models.JobReq
 	err := json.NewDecoder(c.Request.Body).Decode(&jobs)
@@ -47,6 +56,12 @@ func (h *handler) jobsByCompanyById(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
+	_, ok = ctx.Value(auth.AuthKey).(jwt.RegisteredClaims)
+	if !ok {
+		log.Error().Str("Traker Id", trackerId).Msg("login first")
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": http.StatusText(http.StatusUnauthorized)})
+		return
+	}
 	companyId := c.Param("ID")
 	listOfJobs, err := h.s.FetchJobByCompanyId(ctx, companyId)
 	if err != nil {
@@ -65,6 +80,12 @@ func (h *handler) fetchJobById(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
+	_, ok = ctx.Value(auth.AuthKey).(jwt.RegisteredClaims)
+	if !ok {
+		log.Error().Str("Traker Id", trackerId).Msg("login first")
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": http.StatusText(http.StatusUnauthorized)})
+		return
+	}
 	jobId := c.Param("ID")
 	job, err := h.s.GetJobById(ctx, jobId)
 	if err != nil {
@@ -81,6 +102,12 @@ func (h *handler) ViewAllJobs(c *gin.Context) {
 	if !ok {
 		log.Error().Msg("TrackerId missing from context")
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
+		return
+	}
+	_, ok = ctx.Value(auth.AuthKey).(jwt.RegisteredClaims)
+	if !ok {
+		log.Error().Str("Traker Id", trackerId).Msg("login first")
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": http.StatusText(http.StatusUnauthorized)})
 		return
 	}
 	job, err := h.s.GetAllJobs(ctx)

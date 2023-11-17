@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"context"
+	"errors"
 	"finalAssing/internal/auth"
 	"finalAssing/internal/middleware"
 	"finalAssing/internal/models"
@@ -35,6 +36,22 @@ func Test_handler_AcceptApplicant(t *testing.T) {
 			},
 			expectedStatusCode: 500,
 			ExpectedResponse:   `{"msg":"Internal Server Error"}`,
+		},
+		{
+			name: "missing jwt claims",
+			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
+				rr := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(rr)
+				httpRequest, _ := http.NewRequest(http.MethodGet, "http://test.com", nil)
+				ctx := httpRequest.Context()
+				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "123")
+				httpRequest = httpRequest.WithContext(ctx)
+				c.Request = httpRequest
+
+				return c, rr, nil
+			},
+			expectedStatusCode: http.StatusUnauthorized,
+			ExpectedResponse:   `{"error":"Unauthorized"}`,
 		},
 		{
 			name: "Invalid Request Body",
@@ -75,6 +92,7 @@ func Test_handler_AcceptApplicant(t *testing.T) {
 				`))
 				ctx := httpRequest.Context()
 				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "12")
+				ctx = context.WithValue(ctx, auth.AuthKey, jwt.RegisteredClaims{})
 				httpRequest = httpRequest.WithContext(ctx)
 				c.Request = httpRequest
 
@@ -82,6 +100,54 @@ func Test_handler_AcceptApplicant(t *testing.T) {
 			},
 			expectedStatusCode: 400,
 			ExpectedResponse:   `{"Error":"All fields are mandatory"}`,
+		},
+		{
+			name: "Unsuccess error in getting response",
+			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
+				rr := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(rr)
+				httpRequest, _ := http.NewRequest(http.MethodPost, "http://test.com:8080", bytes.NewBufferString(`
+				[
+					{
+						"name": "Vikalp Tyagi",
+						"job": 1,
+						"experience": 3,
+						"noticePeriode": 2,
+						"salary": 50000,
+						"locations": [1, 2, 3],
+						"skills": [1, 2, 3],
+						"WorkMode": "Full-Time",
+						"qualification": [1],
+						"Shift": "Day"
+					},
+					{
+						"name": "Akash",
+						"job": 1,
+						"experience": 3,
+						"noticePeriode": 2,
+						"salary": 90000,
+						"locations": [1, 2, 3],
+						"skills": [1, 2, 3],
+						"WorkMode": "Full-Time",
+						"qualification": [1],
+						"Shift": "Day"
+					}
+				]
+				`))
+				ctx := httpRequest.Context()
+				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "12")
+				ctx = context.WithValue(ctx, auth.AuthKey, jwt.RegisteredClaims{})
+				httpRequest = httpRequest.WithContext(ctx)
+				c.Request = httpRequest
+
+				mc := gomock.NewController(t)
+				ms := services.NewMockService(mc)
+				ms.EXPECT().FIlterApplication(ctx, gomock.Any()).Return(nil, errors.New("test error")).Times(1)
+
+				return c, rr, ms
+			},
+			expectedStatusCode: 500,
+			ExpectedResponse:   `{"msg":"Internal Server Error"}`,
 		},
 		{
 			name: "Success Case",
@@ -118,6 +184,7 @@ func Test_handler_AcceptApplicant(t *testing.T) {
 				`))
 				ctx := httpRequest.Context()
 				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "12")
+				ctx = context.WithValue(ctx, auth.AuthKey, jwt.RegisteredClaims{})
 				httpRequest = httpRequest.WithContext(ctx)
 				c.Request = httpRequest
 
@@ -127,7 +194,7 @@ func Test_handler_AcceptApplicant(t *testing.T) {
 					{
 						Name:  "Vikalp Tyagi",
 						JobId: 1,
-					}}, nil).AnyTimes()
+					}}, nil).Times(1)
 
 				return c, rr, ms
 			},
