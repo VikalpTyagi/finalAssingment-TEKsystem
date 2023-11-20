@@ -23,7 +23,7 @@ func (h *handler) Signup(c *gin.Context) {
 	ctx := c.Request.Context()
 	traceId, ok := ctx.Value(middleware.TrackerIdKey).(string)
 	if !ok {
-		log.Error().Msg("traceId missing from context")
+		log.Error().Msg("trakerId missing from context")
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
