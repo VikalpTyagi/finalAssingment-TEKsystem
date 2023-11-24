@@ -53,6 +53,48 @@ func (mr *MockRedInterfaceMockRecorder) AddJobData(ctx, jobId, jobData any) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddJobData", reflect.TypeOf((*MockRedInterface)(nil).AddJobData), ctx, jobId, jobData)
 }
 
+// AddOtp mocks base method.
+func (m *MockRedInterface) AddOtp(ctx context.Context, otp int, userEmail string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddOtp", ctx, otp, userEmail)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddOtp indicates an expected call of AddOtp.
+func (mr *MockRedInterfaceMockRecorder) AddOtp(ctx, otp, userEmail any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddOtp", reflect.TypeOf((*MockRedInterface)(nil).AddOtp), ctx, otp, userEmail)
+}
+
+// CheckOTP mocks base method.
+func (m *MockRedInterface) CheckOTP(ctx context.Context, userEmail string, otp int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckOTP", ctx, userEmail, otp)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CheckOTP indicates an expected call of CheckOTP.
+func (mr *MockRedInterfaceMockRecorder) CheckOTP(ctx, userEmail, otp any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckOTP", reflect.TypeOf((*MockRedInterface)(nil).CheckOTP), ctx, userEmail, otp)
+}
+
+// DeleteOtp mocks base method.
+func (m *MockRedInterface) DeleteOtp(ctx context.Context, userEmail string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteOtp", ctx, userEmail)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteOtp indicates an expected call of DeleteOtp.
+func (mr *MockRedInterfaceMockRecorder) DeleteOtp(ctx, userEmail any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOtp", reflect.TypeOf((*MockRedInterface)(nil).DeleteOtp), ctx, userEmail)
+}
+
 // FetchJobData mocks base method.
 func (m *MockRedInterface) FetchJobData(ctx context.Context, jobId uint) (*models.Job, error) {
 	m.ctrl.T.Helper()

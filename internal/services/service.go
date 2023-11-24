@@ -21,6 +21,8 @@ type Service interface {
 	CreateCompany(ctx context.Context, newComp models.Company) (models.Company, error)
 	CreateUser(ctx context.Context, nu models.NewUser) (models.User, error)
 	Authenticate(ctx context.Context, email, password string) (jwt.RegisteredClaims, error)
+	VerifyEmailnDob(ctx context.Context, data *models.ForgetPass)error
+	VerifyOtp(ctx context.Context, data *models.OTPcont) error
 
 	FIlterApplication(ctx context.Context, applicantList []*models.ApplicantReq) ([]*models.ApplicantRespo, error)
 }

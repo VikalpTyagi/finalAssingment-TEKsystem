@@ -22,6 +22,10 @@ type RedisConn struct {
 type RedInterface interface {
 	AddJobData(ctx context.Context, jobId uint, jobData *models.Job) error
 	FetchJobData(ctx context.Context, jobId uint) (*models.Job, error)
+
+	AddOtp(ctx context.Context, otp int, userEmail string) error
+	CheckOTP(ctx context.Context, userEmail string, otp int) error
+	DeleteOtp(ctx context.Context, userEmail string) error
 }
 
 func NewRedConn(client *redis.Client) (RedInterface, error) {
@@ -63,4 +67,39 @@ func (r *RedisConn) FetchJobData(ctx context.Context, jobId uint) (*models.Job, 
 		return nil, err
 	}
 	return jobData, nil
+}
+
+func (r *RedisConn) AddOtp(ctx context.Context, otp int, userEmail string) error {
+	strOtp := strconv.FormatInt(int64(otp), 10)
+	err := r.red.Set(ctx, userEmail, strOtp, 5*time.Minute).Err()
+	if err != nil {
+		log.Error().Err(err).Interface("user email", userEmail).Msg("failure in cache of OTP")
+		return err
+	}
+	log.Info().Msg("OTP added to redis successfuly!")
+	return nil
+}
+
+func (r *RedisConn) CheckOTP(ctx context.Context, userEmail string, otp int) error {
+	data, err := r.red.Get(ctx, userEmail).Result()
+	if err != nil {
+		log.Error().Err(err).Msg("Invalid Email")
+		return err
+	}
+	if data != strconv.FormatInt(int64(otp), 10) {
+		log.Error().Err(errors.New("OTP didn't match"))
+		return err
+	}
+	log.Info().Msg("OTP Verified")
+	return nil
+}
+
+func (r *RedisConn) DeleteOtp(ctx context.Context, userEmail string) error {
+	_, err := r.red.Del(ctx, userEmail).Result()
+	if err != nil {
+		log.Error().Err(err).Msg("OTP not deleted from redis")
+		return err
+	}
+	log.Info().Msg("OTP successfuly deleted from redis")
+	return nil
 }

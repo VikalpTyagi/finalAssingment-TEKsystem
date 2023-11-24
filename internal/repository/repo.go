@@ -13,6 +13,8 @@ import (
 type RepoInterface interface {
 	SaveUser(ctx context.Context, nu models.NewUser) (models.User, error)
 	CheckEmail(email, password string) (models.User, error)
+	CheckEmailDob(data *models.ForgetPass) error
+	UpdatePassword(userEmail string, password string) error
 
 	SaveCompany(newComp models.Company) (models.Company, error)
 	FetchAllCompanies(ctx context.Context) ([]models.Company, error)

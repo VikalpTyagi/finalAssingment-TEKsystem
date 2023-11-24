@@ -39,21 +39,6 @@ func (m *MockRepoInterface) EXPECT() *MockRepoInterfaceMockRecorder {
 	return m.recorder
 }
 
-// GetJobRequirment mocks base method.
-func (m *MockRepoInterface) GetJobRequirment(jobId uint) (*models.Job, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetJobRequirment", jobId)
-	ret0, _ := ret[0].(*models.Job)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetJobRequirment indicates an expected call of GetJobRequirment.
-func (mr *MockRepoInterfaceMockRecorder) GetJobRequirment(jobId any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetJobRequirment", reflect.TypeOf((*MockRepoInterface)(nil).GetJobRequirment), jobId)
-}
-
 // CheckEmail mocks base method.
 func (m *MockRepoInterface) CheckEmail(email, password string) (models.User, error) {
 	m.ctrl.T.Helper()
@@ -67,6 +52,20 @@ func (m *MockRepoInterface) CheckEmail(email, password string) (models.User, err
 func (mr *MockRepoInterfaceMockRecorder) CheckEmail(email, password any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckEmail", reflect.TypeOf((*MockRepoInterface)(nil).CheckEmail), email, password)
+}
+
+// CheckEmailDob mocks base method.
+func (m *MockRepoInterface) CheckEmailDob(data *models.ForgetPass) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckEmailDob", data)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CheckEmailDob indicates an expected call of CheckEmailDob.
+func (mr *MockRepoInterfaceMockRecorder) CheckEmailDob(data any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckEmailDob", reflect.TypeOf((*MockRepoInterface)(nil).CheckEmailDob), data)
 }
 
 // FetchAllCompanies mocks base method.
@@ -129,6 +128,21 @@ func (mr *MockRepoInterfaceMockRecorder) GetCompaniesById(ctx, companyId any) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCompaniesById", reflect.TypeOf((*MockRepoInterface)(nil).GetCompaniesById), ctx, companyId)
 }
 
+// GetJobRequirment mocks base method.
+func (m *MockRepoInterface) GetJobRequirment(jobId uint) (*models.Job, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetJobRequirment", jobId)
+	ret0, _ := ret[0].(*models.Job)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetJobRequirment indicates an expected call of GetJobRequirment.
+func (mr *MockRepoInterfaceMockRecorder) GetJobRequirment(jobId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetJobRequirment", reflect.TypeOf((*MockRepoInterface)(nil).GetJobRequirment), jobId)
+}
+
 // GetJobsByCId mocks base method.
 func (m *MockRepoInterface) GetJobsByCId(ctx context.Context, companyId string) ([]models.Job, error) {
 	m.ctrl.T.Helper()
@@ -187,4 +201,18 @@ func (m *MockRepoInterface) SaveUser(ctx context.Context, nu models.NewUser) (mo
 func (mr *MockRepoInterfaceMockRecorder) SaveUser(ctx, nu any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveUser", reflect.TypeOf((*MockRepoInterface)(nil).SaveUser), ctx, nu)
+}
+
+// UpdatePassword mocks base method.
+func (m *MockRepoInterface) UpdatePassword(userEmail, password string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdatePassword", userEmail, password)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdatePassword indicates an expected call of UpdatePassword.
+func (mr *MockRepoInterfaceMockRecorder) UpdatePassword(userEmail, password any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePassword", reflect.TypeOf((*MockRepoInterface)(nil).UpdatePassword), userEmail, password)
 }
