@@ -8,6 +8,14 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type EmailService interface {
+	EmailSender(userEmail string, otp int) error
+}
+
+type Email struct {
+	E EmailService
+}
+
 func EmailSender(userEmail string, otp int) error {
 	// Sender's email address and password
 	cfg := config.GetConfig()

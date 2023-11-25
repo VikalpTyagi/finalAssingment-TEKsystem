@@ -41,7 +41,7 @@ type AuthKeys struct{
 	PrivateKey string `env:"PRIVATE_KEY,required=true"`
 }
 type EmailConfig struct{
-	Port string `env:"EMAIL_PORT,required=true"`
+	Port int `env:"EMAIL_PORT,required=true"`
 	SenderMail string `env:"EMAIL_SENDERMAIL,required=true"`
 	Password string `env:"EMAIL_PASSWORD,required=true"`
 }
