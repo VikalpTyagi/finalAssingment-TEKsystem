@@ -13,6 +13,7 @@ services:
       - .app.redis.env
       - .app.private.key.env
       - .app.public.key.env
+      - .app.email.env
     depends_on:
       - postgres
       - redis
