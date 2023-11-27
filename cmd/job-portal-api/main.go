@@ -25,7 +25,7 @@ func main() {
 	log.Info().Msg("hello this is our app")
 }
 func startApp() error {
-
+	config.Init()
 	cfg := config.GetConfig() //@ this will give us config and initialize it
 	log.Info().Msg("Config intialize sucessfully")
 	// Initialize authentication support

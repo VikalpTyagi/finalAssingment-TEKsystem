@@ -7,7 +7,7 @@ type User struct {
 	gorm.Model
 	Name     string `json:"name"`
 	Email    string `json:"email"`
-	DOB    string `json:"datOfBirth"`
+	DOB    string `json:"dateOfBirth"`
 	PassHash string `json:"-"`
 }
 type NewUser struct {

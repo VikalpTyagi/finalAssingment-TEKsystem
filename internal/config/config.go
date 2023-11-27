@@ -16,11 +16,11 @@ type Config struct {
 }
 
 type AppConfig struct {
-	Host string `env:"APP_HOST"`
-	Port string `env:"APP_PORT,required=true"`
-	ReadTimeout uint `env:"APP_READTIMEOUT,required=true"`
-	WriteTimeout uint `env:"APP_WRITETIMEOUT,required=true"`
-	IdleTimeout uint `env:"APP_IDLETIMEOUT,required=true"`
+	Host         string `env:"APP_HOST"`
+	Port         string `env:"APP_PORT,required=true"`
+	ReadTimeout  uint   `env:"APP_READTIMEOUT,required=true"`
+	WriteTimeout uint   `env:"APP_WRITETIMEOUT,required=true"`
+	IdleTimeout  uint   `env:"APP_IDLETIMEOUT,required=true"`
 }
 type RedisConfig struct {
 	RedisAddr     string `env:"REDIS_ADDR,required=true"`
@@ -36,20 +36,20 @@ type DbConfig struct {
 	DbSSLMode  string `env:"POSTGRES_SSLMODE,required=true"`
 	DbTimeZone string `env:"POSTGRES_TIMEZONE,required=true"`
 }
-type AuthKeys struct{
-	PublicKey string `env:"PUBLIC_KEY,required=true"`
+type AuthKeys struct {
+	PublicKey  string `env:"PUBLIC_KEY,required=true"`
 	PrivateKey string `env:"PRIVATE_KEY,required=true"`
 }
-type EmailConfig struct{
-	Port int `env:"EMAIL_PORT,required=true"`
+type EmailConfig struct {
+	Port       int    `env:"EMAIL_PORT,required=true"`
 	SenderMail string `env:"EMAIL_SENDERMAIL,required=true"`
-	Password string `env:"EMAIL_PASSWORD,required=true"`
+	Password   string `env:"EMAIL_PASSWORD,required=true"`
 }
 
-func init() {
+func Init() {
 	_, err := env.UnmarshalFromEnviron(&cfg)
 	if err != nil {
-		log.Fatal().Err(err).Msg("prblem in config")
+		log.Fatal().Err(err).Msg("problem in config")
 		return
 	}
 }
