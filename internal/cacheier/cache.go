@@ -70,8 +70,8 @@ func (r *RedisConn) FetchJobData(ctx context.Context, jobId uint) (*models.Job, 
 }
 
 func (r *RedisConn) AddOtp(ctx context.Context, otp int, userEmail string) error {
-	strOtp := strconv.FormatInt(int64(otp), 10)
-	err := r.red.Set(ctx, userEmail, strOtp, 5*time.Minute).Err()
+	fmt.Println("email---",userEmail)
+	err := r.red.Set(ctx, userEmail, otp, 5*time.Minute).Err()
 	if err != nil {
 		log.Error().Err(err).Interface("user email", userEmail).Msg("failure in cache of OTP")
 		return err

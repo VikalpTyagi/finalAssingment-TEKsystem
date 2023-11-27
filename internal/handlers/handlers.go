@@ -40,16 +40,19 @@ func API(a *auth.Auth, c repository.RepoInterface, red *redis.Client) *gin.Engin
 	ginEngine.GET("/check", mid.Authenticate(check))
 	ginEngine.POST("/api/register", h.Signup)
 	ginEngine.POST("/api/login", h.Login)
-	ginEngine.POST("/api/companies", h.RegisterCompany)
-	ginEngine.GET("/api/companies", h.fetchListOfCompany)
-	ginEngine.GET("/api/companies/:ID", h.companyById)
-	ginEngine.POST("/api/companies/:ID/jobs", h.addJobsById)
+	ginEngine.POST("/api/companies",mid.Authenticate( h.RegisterCompany))
+	ginEngine.GET("/api/companies",mid.Authenticate( h.fetchListOfCompany))
+	ginEngine.GET("/api/companies/:ID",mid.Authenticate( h.companyById))
+	ginEngine.POST("/api/companies/:ID/jobs",mid.Authenticate( h.addJobsById))
 
-	ginEngine.GET("/api/jobs/:ID", h.fetchJobById)
-	ginEngine.GET("/api/companies/:ID/jobs", h.jobsByCompanyById)
-	ginEngine.GET("/api/jobs", h.ViewAllJobs)
+	ginEngine.GET("/api/jobs/:ID",mid.Authenticate( h.fetchJobById))
+	ginEngine.GET("/api/companies/:ID/jobs",mid.Authenticate( h.jobsByCompanyById))
+	ginEngine.GET("/api/jobs",mid.Authenticate( h.ViewAllJobs))
 
-	ginEngine.POST("api/applicant", h.AcceptApplicant)
+	ginEngine.POST("api/applicant",mid.Authenticate( h.AcceptApplicant))
+
+	ginEngine.POST("api/forgetPassword",h.ForgetPassword)
+	ginEngine.POST("api/updatePassword",h.SetNewPassword)
 
 	return ginEngine
 }

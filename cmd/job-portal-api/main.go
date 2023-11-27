@@ -27,7 +27,7 @@ func main() {
 func startApp() error {
 
 	cfg := config.GetConfig() //@ this will give us config and initialize it
-	log.Info().Interface("cfg", cfg).Msg("Config intialize failed")
+	log.Info().Msg("Config intialize sucessfully")
 	// Initialize authentication support
 	log.Info().Msg("main : Started : Initializing authentication support")
 	// privatePEM, err := os.ReadFile(`private.pem`)
