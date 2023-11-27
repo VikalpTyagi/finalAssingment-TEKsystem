@@ -117,7 +117,9 @@ func (h *handler) ForgetPassword(c *gin.Context) {
 	validate := validator.New()
 	err = validate.Struct(forgetPass)
 	if err != nil {
-		log.Error().Err(err).Msg("validation failed for forget password")
+		log.Error().Err(err).Str("Tracker Id", trackerId).Msg("validation failed for forget password")
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Error":"Provided Invalid data"})
+		return 
 	}
 
 	err = h.s.VerifyEmailnDob(ctx, &forgetPass)
@@ -147,9 +149,12 @@ func (h *handler) SetNewPassword(c *gin.Context) {
 	err = validate.Struct(data)
 	if err != nil {
 		log.Error().Err(err).Msg("validation failed for forget password")
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Error":"Invalid data provided"})
+		return
 	}
 	if (data.Password != data.ConfirmPassword){
 		log.Error().Interface("Email",data.Email).Msg("Password and confirm password not same ")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"Error": "Password not changed"})
 		return
 	}
 

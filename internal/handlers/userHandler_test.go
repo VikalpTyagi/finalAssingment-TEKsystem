@@ -208,23 +208,113 @@ func Test_handler_Login(t *testing.T) {
 
 				mc := gomock.NewController(t)
 				ms := services.NewMockService(mc)
-				ms.EXPECT().Authenticate(gomock.Any(), gomock.Any(),gomock.Any()).Return(jwt.RegisteredClaims{}, errors.New("test error")).Times(1)
+				ms.EXPECT().Authenticate(gomock.Any(), gomock.Any(), gomock.Any()).Return(jwt.RegisteredClaims{}, errors.New("test error")).Times(1)
 				return c, rr, ms
 			},
 			expectedStatusCode: 401,
+			ExpectedResponse:   `{"msg":"login failed"}`,
+		},
+		{
+			name: "Success Case",
+			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
+				rr := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(rr)
+				httpRequest := httptest.NewRequest("Post", "https://test.com:8080", bytes.NewBufferString(`{
+					"email":"vikalp@gmail.com",
+					"password": "vikalp123"
+				}`))
+				ctx := httpRequest.Context()
+				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "12")
+				httpRequest = httpRequest.WithContext(ctx)
+				c.Request = httpRequest
+
+				mc := gomock.NewController(t)
+				ms := services.NewMockService(mc)
+				ms.EXPECT().Authenticate(gomock.Any(), gomock.Any(), gomock.Any()).Return(jwt.RegisteredClaims{}, nil).Times(1)
+				return c, rr, ms
+			},
+			expectedStatusCode: 200,
 			ExpectedResponse:   `{"msg":"login failed"}`,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gin.SetMode(gin.TestMode)
-			c,rr, ms :=tt.setup()
+			c, rr, ms := tt.setup()
+			h := &handler{
+				s: ms,
+			}
+			h.Login(c)
+			assert.Equal(t, tt.ExpectedResponse, rr.Body.String())
+			assert.Equal(t, tt.expectedStatusCode, rr.Code)
+		})
+	}
+}
+
+func Test_handler_ForgetPassword(t *testing.T) {
+	
+	tests := []struct {
+		name string
+		setup func ()  (*gin.Context, *httptest.ResponseRecorder, services.Service)
+		ExpectedResponse string
+		expectedStatusCode int
+		
+	}{
+		{
+			name: "Error: Tracker Id missing",
+			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
+				rr := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(rr)
+				c.Request = httptest.NewRequest("POST", "http://test.com:8080", nil)
+				return c, rr, nil
+			},
+			expectedStatusCode: 500,
+			ExpectedResponse:   `{"msg":"Internal Server Error"}`,
+		},
+		{
+			name: "Error: Invalid json",
+			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
+				rr := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(rr)
+				httpRequest := httptest.NewRequest("POST", "http://test.com:8080", bytes.NewBufferString("{Invalid Body}"))
+				ctx := httpRequest.Context()
+				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "12")
+				httpRequest = httpRequest.WithContext(ctx)
+				c.Request = httpRequest
+				return c, rr, nil
+			},
+			expectedStatusCode: 500,
+			ExpectedResponse:   `{"msg":"Internal Server Error"}`,
+		},
+		{
+			name: "Error: Validation Failed",
+			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.Service) {
+				rr := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(rr)
+				httpRequest := httptest.NewRequest("POST", "https://test.com:8080", bytes.NewBufferString(`{
+					"dateOfBirth":"15-05-1999",
+					"email":"vikalptyagi15@gmail.com"
+				}`))
+				ctx := httpRequest.Context()
+				ctx = context.WithValue(ctx, middleware.TrackerIdKey, "12")
+				httpRequest = httpRequest.WithContext(ctx)
+				c.Request = httpRequest
+				return c, rr, nil
+			},
+			expectedStatusCode: 400,
+			ExpectedResponse:   `{"Error":"provided Invalid data"}`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gin.SetMode(gin.TestMode)
+			c, rr, ms :=tt.setup()
 			h := &handler{
 				s:ms,
 			}
-			h.Login(c)
-			assert.Equal(t,tt.ExpectedResponse,rr.Body.String())
-			assert.Equal(t,tt.expectedStatusCode,rr.Code)
+			h.ForgetPassword(c)
+			assert.Equal(t, tt.ExpectedResponse,rr.Body.String())
+			assert.Equal(t, tt.expectedStatusCode,rr.Code)
 		})
 	}
 }

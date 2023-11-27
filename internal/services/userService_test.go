@@ -145,7 +145,6 @@ func TestStore_Authenticate(t *testing.T) {
 				}, nil
 			},
 		},
-		// Test case for empty email or password
 		{
 			name: "Error: Empty Email or Password",
 			args: args{
