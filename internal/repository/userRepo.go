@@ -13,7 +13,7 @@ import (
 func (r *ReposStruct) SaveUser(ctx context.Context, nu models.NewUser) (models.User, error) {
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(nu.Password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Err(err).Msg("Error in hashing of Password")
+		log.Error().Err(err).Msg("Error in hashing of Password")
 		return models.User{}, fmt.Errorf("generating password hash: %w", err)
 	}
 	userData := models.User{

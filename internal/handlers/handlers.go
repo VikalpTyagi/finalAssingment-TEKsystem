@@ -15,7 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func API(a *auth.Auth, c repository.RepoInterface, red *redis.Client) *gin.Engine {
+func API(a auth.Auth, c repository.RepoInterface, red *redis.Client) *gin.Engine {
 
 	ginEngine := gin.New()
 	mid, err := middleware.NewMid(a)

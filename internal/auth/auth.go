@@ -11,21 +11,27 @@ type ctxKey int
 
 const AuthKey ctxKey = 1
 
-type Auth struct {
+//go:generate mockgen -source auth.go -destination auth_mock.go -package auth
+type Auth interface{
+	GenerateToken(claims jwt.RegisteredClaims) (string, error)
+	ValidateToken(token string) (jwt.RegisteredClaims, error)
+}
+
+type auth struct {
 	privateKey *rsa.PrivateKey
 	publicKey  *rsa.PublicKey
 }
 
-func NewAuth(privateKey *rsa.PrivateKey, publicKey *rsa.PublicKey) (*Auth, error) {
+func NewAuth(privateKey *rsa.PrivateKey, publicKey *rsa.PublicKey) (Auth, error) {
 	if privateKey == nil || publicKey == nil {
 		err := errors.New("private/public key is not present")
 		return nil, err
 	}
-	return &Auth{privateKey: privateKey,
+	return &auth{privateKey: privateKey,
 		publicKey: publicKey}, nil
 }
 
-func (a *Auth) GenerateToken(claims jwt.RegisteredClaims) (string, error) {
+func (a *auth) GenerateToken(claims jwt.RegisteredClaims) (string, error) {
 	//NewWithClaims creates a new Token with the specified signing method and claims.
 	tkn := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 
@@ -38,7 +44,7 @@ func (a *Auth) GenerateToken(claims jwt.RegisteredClaims) (string, error) {
 	return tokenStr, nil
 }
 
-func (a *Auth) ValidateToken(token string) (jwt.RegisteredClaims, error) {
+func (a *auth) ValidateToken(token string) (jwt.RegisteredClaims, error) {
 	var c jwt.RegisteredClaims
 	// Parse the token with the registered claims.
 	tkn, err := jwt.ParseWithClaims(token, &c, func(token *jwt.Token) (interface{}, error) {

@@ -21,7 +21,7 @@ type NewUser struct {
 //*====================== for forget password =========================================
 type ForgetPass struct {
 	DOB   string `json:"dateOfBirth" validate:"required"`
-	Email string `json:"email" validate:"required"`
+	Email string `json:"email" validate:"required,email"`
 }
 
 type OTPcont struct{

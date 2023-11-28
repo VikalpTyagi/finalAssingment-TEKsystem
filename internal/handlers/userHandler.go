@@ -16,7 +16,7 @@ import (
 
 type handler struct {
 	s services.Service
-	a *auth.Auth
+	a auth.Auth
 }
 
 func (h *handler) Signup(c *gin.Context) {
@@ -73,6 +73,7 @@ func (h *handler) Login(c *gin.Context) {
 		return
 	}
 	validate := validator.New()
+
 	err = validate.Struct(login)
 	if err != nil {
 		log.Error().Err(err).Str("tracker Id", trackerId).Send()
@@ -118,8 +119,8 @@ func (h *handler) ForgetPassword(c *gin.Context) {
 	err = validate.Struct(forgetPass)
 	if err != nil {
 		log.Error().Err(err).Str("Tracker Id", trackerId).Msg("validation failed for forget password")
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Error":"Provided Invalid data"})
-		return 
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Error": "Provided Invalid data"})
+		return
 	}
 
 	err = h.s.VerifyEmailnDob(ctx, &forgetPass)
@@ -149,11 +150,11 @@ func (h *handler) SetNewPassword(c *gin.Context) {
 	err = validate.Struct(data)
 	if err != nil {
 		log.Error().Err(err).Msg("validation failed for forget password")
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Error":"Invalid data provided"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Error": "Invalid data provided"})
 		return
 	}
-	if (data.Password != data.ConfirmPassword){
-		log.Error().Interface("Email",data.Email).Msg("Password and confirm password not same ")
+	if data.Password != data.ConfirmPassword {
+		log.Error().Interface("Email", data.Email).Msg("Password and confirm password not same ")
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"Error": "Password not changed"})
 		return
 	}
@@ -165,4 +166,3 @@ func (h *handler) SetNewPassword(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, gin.H{"Msg": "Password Changed"})
 }
-
