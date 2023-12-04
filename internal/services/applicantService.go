@@ -9,20 +9,23 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var ch = make(chan *models.ApplicantReq)
-
 func (s *Store) FIlterApplication(ctx context.Context, applicantList []*models.ApplicantReq) ([]*models.ApplicantRespo, error) {
 	var response []*models.ApplicantRespo
 
 	wg := &sync.WaitGroup{}
-
+	var ch = make(chan *models.ApplicantReq)
 	for _, applicant := range applicantList {
 		wg.Add(1)
 		go func(appl *models.ApplicantReq) {
 			defer wg.Done()
 
-			s.Filter(appl) //@ Calls a function(Scroll down) for comparision and filteration
+			err := s.Filter(ctx, appl) //@ Calls a function(Scroll down) for comparision and filteration
+			if err != nil {
+				log.Error().Err(err).Msg("Error in filter of application")
 
+				return
+			}
+			ch <- appl
 		}(applicant)
 	}
 
@@ -42,32 +45,33 @@ func (s *Store) FIlterApplication(ctx context.Context, applicantList []*models.A
 	return response, nil
 }
 
-func (s *Store) Filter(appl *models.ApplicantReq) {
+func (s *Store) Filter(ctx context.Context, appl *models.ApplicantReq) error {
 
-	jobData, err := s.Repo.ApplicantsFilter(appl.JobId) //@ fetching job data
+	// jobData, err := s.Repo.GetJobRequirment(appl.JobId) //@ fetching job data
+	jobData, err := s.fetchJobData(ctx, appl.JobId)
 	if err != nil {
 		log.Error().Err(err).Interface("Job ID", appl.JobId).Send()
-		return
+		return errors.New("data not fetched from db")
 	}
 	if jobData.Budget < appl.Budget {
 		log.Error().Err(errors.New("budget requirments not met")).Interface("applicant ID", appl.Name).Send()
-		return
+		return errors.New("budget requirments not met")
 	}
 	if jobData.Experience < appl.Experience || appl.Experience < jobData.MinExp {
 		log.Error().Err(errors.New("experience requirments not met")).Interface("applicant ID", appl.Name).Send()
-		return
+		return errors.New("experience requirments not met")
 	}
 	if jobData.Max_NP < appl.Max_NP || appl.Max_NP < jobData.Min_NP {
 		log.Error().Err(errors.New("notice periode requirments not met")).Interface("applicant ID", appl.Name).Send()
-		return
+		return errors.New("notice periode requirments not met")
 	}
 	if jobData.Shift != appl.Shift {
 		log.Error().Err(errors.New("working shift requirments not met")).Interface("applicant ID", appl.Name).Send()
-		return
+		return errors.New("working shift requirments not met")
 	}
 	if jobData.WorkMode != appl.WorkMode {
 		log.Error().Err(errors.New("work mode requirments not met")).Interface("applicant ID", appl.Name).Send()
-		return
+		return errors.New("work mode requirments not met")
 	}
 	var passed bool
 	for _, j := range jobData.Qualifications {
@@ -79,9 +83,9 @@ func (s *Store) Filter(appl *models.ApplicantReq) {
 	}
 	if !passed {
 		log.Error().Err(errors.New("qualification requirments not met")).Interface("applicant ID", appl.Name).Send()
-		return
+		return errors.New("qualification requirments not met")
 	}
-	available := false 
+	available := false
 	for _, j := range jobData.Locations {
 		for _, a := range appl.Locations {
 			if j.Model.ID == a {
@@ -91,7 +95,7 @@ func (s *Store) Filter(appl *models.ApplicantReq) {
 	}
 	if !available {
 		log.Error().Err(errors.New("location requirments not met")).Interface("applicant ID", appl.Name).Send()
-		return
+		return errors.New("location requirments not met")
 	}
 	count := 0
 	for _, j := range jobData.Stack {
@@ -103,8 +107,24 @@ func (s *Store) Filter(appl *models.ApplicantReq) {
 	}
 	if count < (len(jobData.Stack) / 2) {
 		log.Error().Err(errors.New("skills requirments not met")).Interface("applicant ID", appl.Name).Send()
-		return
+		return errors.New("skills requirments not met")
 	}
 
-	ch <- appl
+	return nil
+}
+
+func (s *Store) fetchJobData(ctx context.Context, jobId uint) (*models.Job, error) {
+	data, err := s.Cache.FetchJobData(ctx, jobId)
+	if err != nil {
+		data, err = s.Repo.GetJobRequirment(jobId)
+		if err != nil {
+			return nil, err
+		}
+		err = s.Cache.AddJobData(ctx, jobId, data)
+		if err != nil {
+			return nil, err
+		}
+		// return data, nil
+	}
+	return data, nil
 }

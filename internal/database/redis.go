@@ -1,12 +1,19 @@
 package database
 
-import "github.com/redis/go-redis/v9"
+import (
+	"finalAssing/internal/config"
 
-func main() {
+	"github.com/redis/go-redis/v9"
+)
 
-	Client := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
-		Password: "",
-		DB: 0,
+func NewRedis(cfg config.Config) *redis.Client {
+	client := redis.NewClient(&redis.Options{
+		// Addr: "redis:6379",
+		// Password: "",
+		// DB: 0,
+		Addr:     cfg.RedisConfig.RedisAddr,
+		Password: cfg.RedisConfig.RedisPassword,
+		DB:       cfg.RedisConfig.RedisDb,
 	})
+	return client
 }

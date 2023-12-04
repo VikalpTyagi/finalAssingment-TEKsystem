@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"finalAssing/internal/auth"
+	"finalAssing/internal/config"
 	"finalAssing/internal/database"
 	"finalAssing/internal/handlers"
 	"finalAssing/internal/repository"
@@ -24,24 +25,26 @@ func main() {
 	log.Info().Msg("hello this is our app")
 }
 func startApp() error {
-
+	config.Init()
+	cfg := config.GetConfig() //@ this will give us config and initialize it
+	log.Info().Msg("Config intialize sucessfully")
 	// Initialize authentication support
 	log.Info().Msg("main : Started : Initializing authentication support")
-	privatePEM, err := os.ReadFile(`C:\Users\ORR Training 17\Documents\final assingment\job portal api\private.pem`)
-	// privatePEM, err := os.ReadFile(`F:\go-TEKsystem\finalAssingment-TEKsystem\private.pem`)
-	if err != nil {
-		return fmt.Errorf("reading auth private key %w", err)
-	}
+	// privatePEM, err := os.ReadFile(`private.pem`)
+	// if err != nil {
+	// 	return fmt.Errorf("reading auth private key %w", err)
+	// }
+	privatePEM := []byte(cfg.AuthKeys.PrivateKey)
 	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privatePEM)
 	if err != nil {
 		return fmt.Errorf("parsing auth private key %w", err)
 	}
 
-	publicPEM, err := os.ReadFile(`C:\Users\ORR Training 17\Documents\final assingment\job portal api\pubkey.pem`)
-	// publicPEM, err := os.ReadFile(`F:\go-TEKsystem\finalAssingment-TEKsystem\pubkey.pem`)
-	if err != nil {
-		return fmt.Errorf("reading auth public key %w", err)
-	}
+	// publicPEM, err := os.ReadFile(`pubkey.pem`)
+	// if err != nil {
+	// 	return fmt.Errorf("reading auth public key %w", err)
+	// }
+	publicPEM := []byte(cfg.AuthKeys.PublicKey)
 
 	publicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicPEM)
 	if err != nil {
@@ -55,20 +58,20 @@ func startApp() error {
 
 	// Start Database
 	log.Info().Msg("main : Started : Initializing db support")
-	db, err := database.Open()
+	db, err := database.Open(cfg)
 	if err != nil {
 		return fmt.Errorf("connecting to db %w", err)
 	}
 	pg, err := db.DB()
 	if err != nil {
-		return fmt.Errorf("Failed to get database instance: %w ", err)
+		return fmt.Errorf("failed to get database instance: %w ", err)
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
 	err = pg.PingContext(ctx)
 	if err != nil {
-		return fmt.Errorf("Database is not connected: %w ", err)
+		return fmt.Errorf("database is not connected: %w ", err)
 	}
 
 	//Initialize Conn layer support
@@ -85,14 +88,21 @@ func startApp() error {
 	if err != nil {
 		return err
 	}
+	// Intializing redis connection
+	redis := database.NewRedis(cfg)
+	_, err = redis.Ping(ctx).Result()
+	if err != nil {
+		log.Panic().Err(err).Msg("Connection with Redis not establish")
+		return err
+	}
 
 	// Initialize http service
 	api := http.Server{
-		Addr:         ":8080",
-		ReadTimeout:  8000 * time.Second,
-		WriteTimeout: 800 * time.Second,
-		IdleTimeout:  800 * time.Second,
-		Handler:      handlers.API(a, repoStruct),
+		Addr:         fmt.Sprintf("%s:%s", cfg.AppConfig.Host, cfg.AppConfig.Port),
+		ReadTimeout:  time.Duration(cfg.AppConfig.ReadTimeout) * time.Second,
+		WriteTimeout: time.Duration(cfg.AppConfig.WriteTimeout) * time.Second,
+		IdleTimeout:  time.Duration(cfg.AppConfig.IdleTimeout) * time.Second,
+		Handler:      handlers.API(a, repoStruct, redis),
 	}
 
 	serverErrors := make(chan error, 1)
@@ -111,6 +121,7 @@ func startApp() error {
 		defer cancel()
 		err := api.Shutdown(ctx)
 		if err != nil {
+			log.Error().Err(err).Msg("Server not working")
 			err = api.Close()
 			return fmt.Errorf("could not stop server gracefully %w", err)
 		}

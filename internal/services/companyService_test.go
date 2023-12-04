@@ -131,7 +131,7 @@ func TestStore_CreateCompany(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockInterface := repository.NewMockRepoInterface(mc)
 			mockInterface.EXPECT().SaveCompany(tt.args.newComp).Return(tt.mockRepoResponse()).AnyTimes()
-			s := NewStore(mockInterface)
+			s := NewStore(mockInterface, nil)
 
 			got, err := s.CreateCompany(tt.args.ctx, tt.args.newComp)
 			if (err != nil) != tt.wantErr {
@@ -203,7 +203,7 @@ func TestStore_ViewCompanies(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockInterface := repository.NewMockRepoInterface(mc)
 			mockInterface.EXPECT().FetchAllCompanies(tt.args.ctx).Return(tt.mockRepoResponse()).AnyTimes()
-			s := NewStore(mockInterface)
+			s := NewStore(mockInterface, nil)
 
 			got, err := s.ViewCompanies(tt.args.ctx)
 			if (err != nil) != tt.wantErr {
@@ -223,62 +223,62 @@ func TestStore_FetchCompanyByID(t *testing.T) {
 		companyId string
 	}
 	tests := []struct {
-		name    string
+		name string
 		// s       *Store
-		args    args
-		want    models.Company
-		wantErr bool
+		args             args
+		want             models.Company
+		wantErr          bool
 		mockRepoResponse func() (models.Company, error)
 	}{
 		{
-            name: "Successful case",
-            args: args{
-                ctx:       context.Background(),
-                companyId: "1",
-            },
-            want: models.Company{
-                Name: "Google",
-                City: "Gurugram",
-            },
-            wantErr: false,
-            mockRepoResponse: func() (models.Company, error) {
-                return models.Company{
-                    Name: "Google",
-                    City: "Gurugram",
-                }, nil
-            },
-        },
-        {
-            name: "Error: Company not found",
-            args: args{
-                ctx:       context.Background(),
-                companyId: "999",
-            },
-            want:    models.Company{},
-            wantErr: true,
-            mockRepoResponse: func() (models.Company, error) {
-                return models.Company{}, errors.New("Company Not found in db")
-            },
-        },
-        {
-            name: "Error: Repository error",
-            args: args{
-                ctx:       context.Background(),
-                companyId: "1",
-            },
-            want:    models.Company{},
-            wantErr: true,
-            mockRepoResponse: func() (models.Company, error) {
-                return models.Company{}, errors.New("repository error")
-            },
-        },
+			name: "Successful case",
+			args: args{
+				ctx:       context.Background(),
+				companyId: "1",
+			},
+			want: models.Company{
+				Name: "Google",
+				City: "Gurugram",
+			},
+			wantErr: false,
+			mockRepoResponse: func() (models.Company, error) {
+				return models.Company{
+					Name: "Google",
+					City: "Gurugram",
+				}, nil
+			},
+		},
+		{
+			name: "Error: Company not found",
+			args: args{
+				ctx:       context.Background(),
+				companyId: "999",
+			},
+			want:    models.Company{},
+			wantErr: true,
+			mockRepoResponse: func() (models.Company, error) {
+				return models.Company{}, errors.New("Company Not found in db")
+			},
+		},
+		{
+			name: "Error: Repository error",
+			args: args{
+				ctx:       context.Background(),
+				companyId: "1",
+			},
+			want:    models.Company{},
+			wantErr: true,
+			mockRepoResponse: func() (models.Company, error) {
+				return models.Company{}, errors.New("repository error")
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockInterface := repository.NewMockRepoInterface(mc)
-			mockInterface.EXPECT().GetCompaniesById(tt.args.ctx,tt.args.companyId).Return(tt.mockRepoResponse()).AnyTimes()
-			s := NewStore(mockInterface)
+			mockInterface.EXPECT().GetCompaniesById(tt.args.ctx, tt.args.companyId).Return(tt.mockRepoResponse()).AnyTimes()
+			s := NewStore(mockInterface, nil)
 			got, err := s.FetchCompanyByID(tt.args.ctx, tt.args.companyId)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Store.FetchCompanyByID() error = %v, wantErr %v", err, tt.wantErr)

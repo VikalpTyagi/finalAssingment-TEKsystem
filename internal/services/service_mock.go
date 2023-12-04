@@ -175,6 +175,34 @@ func (mr *MockServiceMockRecorder) JobByCompanyId(jobs, compId any) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JobByCompanyId", reflect.TypeOf((*MockService)(nil).JobByCompanyId), jobs, compId)
 }
 
+// VerifyEmailnDob mocks base method.
+func (m *MockService) VerifyEmailnDob(ctx context.Context, data *models.ForgetPass) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VerifyEmailnDob", ctx, data)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// VerifyEmailnDob indicates an expected call of VerifyEmailnDob.
+func (mr *MockServiceMockRecorder) VerifyEmailnDob(ctx, data any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyEmailnDob", reflect.TypeOf((*MockService)(nil).VerifyEmailnDob), ctx, data)
+}
+
+// VerifyOtp mocks base method.
+func (m *MockService) VerifyOtp(ctx context.Context, data *models.OTPcont) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VerifyOtp", ctx, data)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// VerifyOtp indicates an expected call of VerifyOtp.
+func (mr *MockServiceMockRecorder) VerifyOtp(ctx, data any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyOtp", reflect.TypeOf((*MockService)(nil).VerifyOtp), ctx, data)
+}
+
 // ViewCompanies mocks base method.
 func (m *MockService) ViewCompanies(ctx context.Context) ([]models.Company, error) {
 	m.ctrl.T.Helper()

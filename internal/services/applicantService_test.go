@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"finalAssing/internal/cacheier"
 	"finalAssing/internal/models"
 	"finalAssing/internal/repository"
 	"testing"
@@ -22,7 +23,9 @@ func TestStore_FIlterApplication(t *testing.T) {
 		args             args
 		want             []*models.ApplicantRespo
 		wantErr          bool
+		mockRedisRes func(redisMock *cacheier.MockRedInterface)
 		mockRepoResponse func(repoMock *repository.MockRepoInterface)
+		
 	}{
 		{
 			name: "Success",
@@ -78,8 +81,87 @@ func TestStore_FIlterApplication(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			mockRedisRes: func(redisMock *cacheier.MockRedInterface) {
+				redisMock.EXPECT().FetchJobData(gomock.Any(),uint(1)).Return(nil,errors.New("test error: faliure in fetching from redis")).Times(1)
+				redisMock.EXPECT().AddJobData(gomock.Any(),uint(1),gomock.Any()).Return(nil).Times(1)
+
+				redisMock.EXPECT().FetchJobData(gomock.Any(),uint(2)).Return(&models.Job{
+					Experience: 4,
+					MinExp:     1,
+					Min_NP:     1,
+					Max_NP:     4,
+					Budget:     80000,
+					Stack: []models.Skill{
+						{
+							Model: gorm.Model{ID: 1},
+						},
+						{
+							Model: gorm.Model{ID: 2},
+						},
+						{
+							Model: gorm.Model{ID: 3},
+						},
+					},
+					Locations: []models.Location{
+						{
+							Model: gorm.Model{ID: 1},
+						},
+						{
+							Model: gorm.Model{ID: 2},
+						},
+						{
+							Model: gorm.Model{ID: 3},
+						},
+					},
+					Qualifications: []models.Qualification{
+						{
+							Model: gorm.Model{ID: 1},
+						},
+					},
+					WorkMode: "Full-Time",
+					Shift:    "Day",
+				},nil).Times(1)
+				redisMock.EXPECT().FetchJobData(gomock.Any(),uint(3)).Return(&models.Job{
+					Experience: 4,
+					MinExp:     1,
+					Min_NP:     1,
+					Max_NP:     4,
+					Budget:     80000,
+					Stack: []models.Skill{
+						{
+							Model: gorm.Model{ID: 1},
+						},
+						{
+							Model: gorm.Model{ID: 2},
+						},
+						{
+							Model: gorm.Model{ID: 3},
+						},
+					},
+					Locations: []models.Location{
+						{
+							Model: gorm.Model{ID: 1},
+						},
+						{
+							Model: gorm.Model{ID: 2},
+						},
+						{
+							Model: gorm.Model{ID: 3},
+						},
+					},
+					Qualifications: []models.Qualification{
+						{
+							Model: gorm.Model{ID: 1},
+						},
+					},
+					WorkMode: "Full-Time",
+					Shift:    "Day",
+				},nil).Times(1)
+
+			},
 			mockRepoResponse: func(repoMock *repository.MockRepoInterface) {
-				repoMock.EXPECT().ApplicantsFilter(uint(1)).Return(&models.Job{
+
+				repoMock.EXPECT().GetJobRequirment(uint(1)).Return(&models.Job{
 					Experience: 4,
 					MinExp:     1,
 					Min_NP:     1,
@@ -115,43 +197,6 @@ func TestStore_FIlterApplication(t *testing.T) {
 					WorkMode: "Full-Time",
 					Shift:    "Day",
 				}, nil).Times(1)
-				repoMock.EXPECT().ApplicantsFilter(uint(2)).Return(&models.Job{
-					Experience: 4,
-					MinExp:     1,
-					Min_NP:     1,
-					Max_NP:     4,
-					Budget:     80000,
-					Stack: []models.Skill{
-						{
-							Model: gorm.Model{ID: 1},
-						},
-						{
-							Model: gorm.Model{ID: 2},
-						},
-						{
-							Model: gorm.Model{ID: 3},
-						},
-					},
-					Locations: []models.Location{
-						{
-							Model: gorm.Model{ID: 1},
-						},
-						{
-							Model: gorm.Model{ID: 2},
-						},
-						{
-							Model: gorm.Model{ID: 3},
-						},
-					},
-					Qualifications: []models.Qualification{
-						{
-							Model: gorm.Model{ID: 1},
-						},
-					},
-					WorkMode: "Full-Time",
-					Shift:    "Day",
-				}, nil).Times(1)
-				repoMock.EXPECT().ApplicantsFilter(uint(3)).Return(nil, errors.New("test error")).Times(1)
 			},
 		},
 
@@ -160,6 +205,18 @@ func TestStore_FIlterApplication(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				applicantList: []*models.ApplicantReq{
+					{ //* problem: Invalid Job id
+						Name:           "Ghanshyam",
+						JobId:          0,
+						Experience:     3,
+						Max_NP:         1,
+						Budget:         90000,
+						Locations:      []uint{1, 2},
+						Stack:          []uint{1, 2, 3},
+						WorkMode:       "Full-Time",
+						Qualifications: []uint{1},
+						Shift:          "Day",
+					},					
 					{ //* problem Budget
 						Name:           "Vijay",
 						JobId:          1,
@@ -256,12 +313,28 @@ func TestStore_FIlterApplication(t *testing.T) {
 						Qualifications: []uint{1},
 						Shift:          "Day",
 					},
+					{ //* problem: Unable to add data in Redis
+						Name:           "Raju",
+						JobId:          9,
+						Experience:     3,
+						Max_NP:         1,
+						Budget:         90000,
+						Locations:      []uint{1, 2},
+						Stack:          []uint{1, 2, 3},
+						WorkMode:       "Full-Time",
+						Qualifications: []uint{1},
+						Shift:          "Day",
+					},
 				},
 			},
 			want:    nil,
 			wantErr: false,
-			mockRepoResponse: func(repoMock *repository.MockRepoInterface) {
-				repoMock.EXPECT().ApplicantsFilter(uint(1)).Return(&models.Job{
+			mockRedisRes: func(redisMock *cacheier.MockRedInterface) {
+				redisMock.EXPECT().FetchJobData(gomock.Any(),uint(0)).Return(nil,errors.New("test error: invalid job id")).Times(1)
+				redisMock.EXPECT().FetchJobData(gomock.Any(),uint(1)).Return(nil,errors.New("test Error : Data not inside redis")).Times(1)
+				redisMock.EXPECT().AddJobData(gomock.Any(),uint(1),gomock.Any()).Return(nil).Times(1)
+
+				redisMock.EXPECT().FetchJobData(gomock.Any(),uint(2)).Return(&models.Job{
 					Experience: 4,
 					MinExp:     1,
 					Min_NP:     1,
@@ -296,8 +369,8 @@ func TestStore_FIlterApplication(t *testing.T) {
 					},
 					WorkMode: "Full-Time",
 					Shift:    "Day",
-				}, nil).AnyTimes()
-				repoMock.EXPECT().ApplicantsFilter(uint(2)).Return(&models.Job{
+				},nil).Times(1)
+				redisMock.EXPECT().FetchJobData(gomock.Any(),uint(3)).Return(&models.Job{
 					Experience: 4,
 					MinExp:     1,
 					Min_NP:     1,
@@ -332,8 +405,8 @@ func TestStore_FIlterApplication(t *testing.T) {
 					},
 					WorkMode: "Full-Time",
 					Shift:    "Day",
-				}, nil).AnyTimes()
-				repoMock.EXPECT().ApplicantsFilter(uint(3)).Return(&models.Job{
+				},nil).Times(1)
+				redisMock.EXPECT().FetchJobData(gomock.Any(),uint(4)).Return(&models.Job{
 					Experience: 4,
 					MinExp:     1,
 					Min_NP:     1,
@@ -368,8 +441,8 @@ func TestStore_FIlterApplication(t *testing.T) {
 					},
 					WorkMode: "Full-Time",
 					Shift:    "Day",
-				}, nil).AnyTimes()
-				repoMock.EXPECT().ApplicantsFilter(uint(4)).Return(&models.Job{
+				},nil).Times(1)
+				redisMock.EXPECT().FetchJobData(gomock.Any(),uint(5)).Return(&models.Job{
 					Experience: 4,
 					MinExp:     1,
 					Min_NP:     1,
@@ -404,8 +477,8 @@ func TestStore_FIlterApplication(t *testing.T) {
 					},
 					WorkMode: "Full-Time",
 					Shift:    "Day",
-				}, nil).AnyTimes()
-				repoMock.EXPECT().ApplicantsFilter(uint(5)).Return(&models.Job{
+				},nil).Times(1)
+				redisMock.EXPECT().FetchJobData(gomock.Any(),uint(6)).Return(&models.Job{
 					Experience: 4,
 					MinExp:     1,
 					Min_NP:     1,
@@ -440,8 +513,8 @@ func TestStore_FIlterApplication(t *testing.T) {
 					},
 					WorkMode: "Full-Time",
 					Shift:    "Day",
-				}, nil).AnyTimes()
-				repoMock.EXPECT().ApplicantsFilter(uint(6)).Return(&models.Job{
+				},nil).Times(1)
+				redisMock.EXPECT().FetchJobData(gomock.Any(),uint(7)).Return(&models.Job{
 					Experience: 4,
 					MinExp:     1,
 					Min_NP:     1,
@@ -476,44 +549,8 @@ func TestStore_FIlterApplication(t *testing.T) {
 					},
 					WorkMode: "Full-Time",
 					Shift:    "Day",
-				}, nil).AnyTimes()
-				repoMock.EXPECT().ApplicantsFilter(uint(7)).Return(&models.Job{
-					Experience: 4,
-					MinExp:     1,
-					Min_NP:     1,
-					Max_NP:     4,
-					Budget:     80000,
-					Stack: []models.Skill{
-						{
-							Model: gorm.Model{ID: 1},
-						},
-						{
-							Model: gorm.Model{ID: 2},
-						},
-						{
-							Model: gorm.Model{ID: 3},
-						},
-					},
-					Locations: []models.Location{
-						{
-							Model: gorm.Model{ID: 1},
-						},
-						{
-							Model: gorm.Model{ID: 2},
-						},
-						{
-							Model: gorm.Model{ID: 3},
-						},
-					},
-					Qualifications: []models.Qualification{
-						{
-							Model: gorm.Model{ID: 1},
-						},
-					},
-					WorkMode: "Full-Time",
-					Shift:    "Day",
-				}, nil).AnyTimes()
-				repoMock.EXPECT().ApplicantsFilter(uint(8)).Return(&models.Job{
+				},nil).Times(1)
+				redisMock.EXPECT().FetchJobData(gomock.Any(),uint(8)).Return(&models.Job{
 					Experience: 4,
 					MinExp:     1,
 					Min_NP:     1,
@@ -551,6 +588,83 @@ func TestStore_FIlterApplication(t *testing.T) {
 					},
 					WorkMode: "Full-Time",
 					Shift:    "Day",
+				},nil).Times(1)
+				redisMock.EXPECT().FetchJobData(gomock.Any(),uint(9)).Return(nil,errors.New("test error: Data not present in redis")).Times(1)
+				redisMock.EXPECT().AddJobData(gomock.Any(),uint(9),gomock.Any()).Return(errors.New("test error:Not saved in redis")).Times(1)
+			},
+			mockRepoResponse: func(repoMock *repository.MockRepoInterface) {
+				repoMock.EXPECT().GetJobRequirment(uint(0)).Return(nil,errors.New("test error: Invalid job Id"))
+				repoMock.EXPECT().GetJobRequirment(uint(1)).Return(&models.Job{
+					Experience: 4,
+					MinExp:     1,
+					Min_NP:     1,
+					Max_NP:     4,
+					Budget:     80000,
+					Stack: []models.Skill{
+						{
+							Model: gorm.Model{ID: 1},
+						},
+						{
+							Model: gorm.Model{ID: 2},
+						},
+						{
+							Model: gorm.Model{ID: 3},
+						},
+					},
+					Locations: []models.Location{
+						{
+							Model: gorm.Model{ID: 1},
+						},
+						{
+							Model: gorm.Model{ID: 2},
+						},
+						{
+							Model: gorm.Model{ID: 3},
+						},
+					},
+					Qualifications: []models.Qualification{
+						{
+							Model: gorm.Model{ID: 1},
+						},
+					},
+					WorkMode: "Full-Time",
+					Shift:    "Day",
+				}, nil).AnyTimes()
+				repoMock.EXPECT().GetJobRequirment(uint(9)).Return(&models.Job{
+					Experience: 4,
+					MinExp:     1,
+					Min_NP:     1,
+					Max_NP:     4,
+					Budget:     80000,
+					Stack: []models.Skill{
+						{
+							Model: gorm.Model{ID: 1},
+						},
+						{
+							Model: gorm.Model{ID: 2},
+						},
+						{
+							Model: gorm.Model{ID: 3},
+						},
+					},
+					Locations: []models.Location{
+						{
+							Model: gorm.Model{ID: 1},
+						},
+						{
+							Model: gorm.Model{ID: 2},
+						},
+						{
+							Model: gorm.Model{ID: 3},
+						},
+					},
+					Qualifications: []models.Qualification{
+						{
+							Model: gorm.Model{ID: 1},
+						},
+					},
+					WorkMode: "Full-Time",
+					Shift:    "Day",
 				}, nil).AnyTimes()
 			},
 		},
@@ -560,8 +674,11 @@ func TestStore_FIlterApplication(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockInterface := repository.NewMockRepoInterface(mc)
+			redisInterface := cacheier.NewMockRedInterface(mc)
 			tt.mockRepoResponse(mockInterface)
-			s := NewStore(mockInterface)
+			tt.mockRedisRes(redisInterface)
+
+			s := NewStore(mockInterface, redisInterface)
 
 			got, err := s.FIlterApplication(tt.args.ctx, tt.args.applicantList)
 			if (err != nil) != tt.wantErr {

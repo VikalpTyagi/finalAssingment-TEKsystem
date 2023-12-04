@@ -2,12 +2,14 @@ package handlers
 
 import (
 	"encoding/json"
+	"finalAssing/internal/auth"
 	"finalAssing/internal/middleware"
 	"finalAssing/internal/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/rs/zerolog/log"
 )
 
@@ -19,8 +21,14 @@ func (h *handler) AcceptApplicant(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
-	var newApplicant []*models.ApplicantReq
+	_, ok = ctx.Value(auth.AuthKey).(jwt.RegisteredClaims)
+	if !ok {
+		log.Error().Str("Traker Id", trackerId).Msg("login first")
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": http.StatusText(http.StatusUnauthorized)})
+		return
+	}
 
+	var newApplicant []*models.ApplicantReq
 	err := json.NewDecoder(c.Request.Body).Decode(&newApplicant)
 	if err != nil {
 		log.Error().Err(err).Str("tracker Id", trackerId).Send()

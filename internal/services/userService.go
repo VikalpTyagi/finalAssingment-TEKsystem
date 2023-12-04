@@ -4,6 +4,7 @@ package services
 import (
 	"context"
 	"finalAssing/internal/models"
+	"finalAssing/pkg"
 	"strconv"
 	"time"
 
@@ -39,4 +40,37 @@ func (s *Store) Authenticate(ctx context.Context, email, password string) (jwt.R
 	}
 
 	return c, nil
+}
+
+func (s *Store) VerifyEmailnDob(ctx context.Context, data *models.ForgetPass) error{
+	err := s.Repo.CheckEmailDob(data)
+	if err !=nil {
+		return err
+	}
+	otp := pkg.OtpGenerator()
+	err =s.Cache.AddOtp(ctx,otp,data.Email)
+	if err !=nil {
+		return err
+	}
+	err =pkg.EmailSender(data.Email,otp)
+	if err !=nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Store) VerifyOtp(ctx context.Context, data *models.OTPcont) error {
+	err := s.Cache.CheckOTP(ctx,data.Email,data.OTP)
+	if err != nil {
+		return err
+	}
+	err = s.Repo.UpdatePassword(data.Email,data.Password)
+	if err != nil {
+		return err
+	}
+	err = s.Cache.DeleteOtp(ctx,data.Email)
+	if err != nil {
+		return err
+	}
+	return nil
 }
